@@ -2,9 +2,9 @@
     <form wire:submit="save" class="fi-sc-form">
         {{ $this->form }}
 
-        <div class="fi-form-actions" style="margin-top: 1.5rem;">
+        <div style="margin-top: 1.5rem;">
             <x-filament::button type="submit" color="primary" icon="heroicon-o-check">
-                Сохранить
+                Сохранить изменения
             </x-filament::button>
         </div>
     </form>
