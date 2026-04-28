@@ -1,12 +1,25 @@
-FROM php:8.4-cli
+FROM php:8.4-fpm-alpine
 
 WORKDIR /var/www/html
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends git unzip libzip-dev libsqlite3-dev libicu-dev pkg-config \
-    && docker-php-ext-install pdo_sqlite zip intl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+        git \
+        unzip \
+        libzip-dev \
+        sqlite-dev \
+        icu-dev \
+        $PHPIZE_DEPS \
+    && docker-php-ext-install pdo_sqlite zip intl opcache \
+    && apk del $PHPIZE_DEPS \
+    && rm -rf /var/cache/apk/*
+
+COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
+COPY docker/php/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-CMD ["sh", "-lc", "if [ ! -f vendor/autoload.php ]; then composer install --no-interaction --prefer-dist; fi && php artisan serve --host=0.0.0.0 --port=8080"]
+EXPOSE 9000
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["php-fpm"]

@@ -59,20 +59,30 @@ abstract class BaseSectionPage extends Page
     {
         $state = $this->form->getState();
 
+        $rows = [];
         foreach ($state as $blockKey => $blockData) {
-            LandingBlock::where('section_code', static::$sectionCode)
-                ->where('block_key', $blockKey)
-                ->update([
-                    'label'       => $blockData['label'] ?? null,
-                    'badge'       => $blockData['badge'] ?? null,
-                    'title'       => $blockData['title'] ?? null,
-                    'subtitle'    => $blockData['subtitle'] ?? null,
-                    'body'        => $blockData['body'] ?? null,
-                    'button_text' => $blockData['button_text'] ?? null,
-                    'button_url'  => $blockData['button_url'] ?? null,
-                    'is_visible'  => $blockData['is_visible'] ?? true,
-                    'meta'        => $blockData['meta'] ?? null,
-                ]);
+            $meta = $blockData['meta'] ?? null;
+            $rows[] = [
+                'section_code' => static::$sectionCode,
+                'block_key'    => $blockKey,
+                'label'        => $blockData['label'] ?? null,
+                'badge'        => $blockData['badge'] ?? null,
+                'title'        => $blockData['title'] ?? null,
+                'subtitle'     => $blockData['subtitle'] ?? null,
+                'body'         => $blockData['body'] ?? null,
+                'button_text'  => $blockData['button_text'] ?? null,
+                'button_url'   => $blockData['button_url'] ?? null,
+                'is_visible'   => (bool) ($blockData['is_visible'] ?? true),
+                'meta'         => is_array($meta) && !empty($meta) ? json_encode($meta) : null,
+            ];
+        }
+
+        if (!empty($rows)) {
+            LandingBlock::upsert(
+                $rows,
+                ['section_code', 'block_key'],
+                ['label', 'badge', 'title', 'subtitle', 'body', 'button_text', 'button_url', 'is_visible', 'meta'],
+            );
         }
 
         Notification::make()

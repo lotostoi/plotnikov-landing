@@ -13,11 +13,13 @@ git fetch --all --prune
 git reset --hard "origin/${BRANCH}"
 
 echo "[deploy] building and starting containers"
-docker compose up -d --build
+docker compose up -d --build --remove-orphans
+
+echo "[deploy] waiting for php-fpm to be ready..."
+sleep 3
 
 echo "[deploy] running artisan tasks"
 docker compose exec -T app php artisan migrate --force
 docker compose exec -T app php artisan storage:link || true
-docker compose exec -T app php artisan optimize:clear
 
 echo "[deploy] done"
