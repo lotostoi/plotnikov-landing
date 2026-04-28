@@ -1,0 +1,18 @@
+{
+    "name": "Александр Психолог",
+    "short_name": "Александр",
+    "description": "Психолог, гештальт-терапевт. Онлайн и очно.",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#f5f0e8",
+    "theme_color": "#f5f0e8",
+    "lang": "ru",
+    "icons": [
+        {
+            "src": "/favicon.ico",
+            "sizes": "any",
+            "type": "image/x-icon"
+        }
+    ]
+}
