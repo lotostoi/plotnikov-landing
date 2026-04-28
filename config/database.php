@@ -35,7 +35,8 @@ return [
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
+            // Docker: ./database с bind-mount часто read-only для www-data; storage — writable volume.
+            'database' => env('DB_DATABASE', storage_path('database/database.sqlite')),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
             'busy_timeout' => null,
