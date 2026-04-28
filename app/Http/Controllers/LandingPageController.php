@@ -9,6 +9,7 @@ use Database\Seeders\LandingBlocksSeeder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class LandingPageController extends Controller
 {
@@ -173,10 +174,12 @@ class LandingPageController extends Controller
             ->values()
             ->all();
 
-        $articles = Article::published()
-            ->latest('published_at')
-            ->limit(3)
-            ->get();
+        $articles = Schema::hasTable('articles')
+            ? Article::published()
+                ->latest('published_at')
+                ->limit(3)
+                ->get()
+            : collect();
 
         $faqs = $faqBlocks
             ->where('block_type', 'faq')
