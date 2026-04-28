@@ -1,5 +1,10 @@
+@php
+    $defaultTheme = in_array($content->default_theme ?? 'warm', ['warm', 'dark'], true)
+        ? ($content->default_theme ?? 'warm')
+        : 'warm';
+@endphp
 <!DOCTYPE html>
-<html lang="ru" data-theme="warm" prefix="og: https://ogp.me/ns#">
+<html lang="ru" data-theme="{{ $defaultTheme }}" data-default-theme="{{ $defaultTheme }}" prefix="og: https://ogp.me/ns#">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -48,8 +53,14 @@
     <script>
         (function () {
             try {
+                var root = document.documentElement;
+                var def = root.getAttribute('data-default-theme') || 'warm';
                 var t = localStorage.getItem('theme');
-                if (t === 'dark' || t === 'warm') document.documentElement.setAttribute('data-theme', t);
+                if (t === 'dark' || t === 'warm') {
+                    root.setAttribute('data-theme', t);
+                } else if (def === 'dark' || def === 'warm') {
+                    root.setAttribute('data-theme', def);
+                }
             } catch (_) {}
         })();
     </script>

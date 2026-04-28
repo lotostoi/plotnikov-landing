@@ -21,10 +21,13 @@
     const initTheme = () => {
         let saved = null;
         try { saved = localStorage.getItem(THEME_KEY); } catch (_) { /* ignore */ }
+        const defaultThemeAttr = root.getAttribute('data-default-theme');
+        const fallback = validThemes.has(defaultThemeAttr) ? defaultThemeAttr : 'warm';
+
         if (validThemes.has(saved)) {
             applyTheme(saved);
         } else if (root.getAttribute('data-theme') == null) {
-            applyTheme('warm');
+            applyTheme(fallback);
         }
     };
 

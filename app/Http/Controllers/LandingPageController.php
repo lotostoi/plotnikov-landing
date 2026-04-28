@@ -405,6 +405,7 @@ class LandingPageController extends Controller
             'show_faq' => true,
             'show_contacts' => true,
             'show_footer' => true,
+            'default_theme' => 'warm',
         ];
     }
 

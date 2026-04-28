@@ -82,6 +82,8 @@ class LandingPageContent extends Model
         'show_faq',
         'show_contacts',
         'show_footer',
+
+        'default_theme',
     ];
 
     protected $casts = [

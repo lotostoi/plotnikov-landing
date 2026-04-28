@@ -289,6 +289,15 @@ class LandingPageContentResource extends Resource
                         Tab::make('Видимость секций')
                             ->icon('heroicon-o-eye')
                             ->schema([
+                                Select::make('default_theme')
+                                    ->label('Тема по умолчанию')
+                                    ->options([
+                                        'warm' => 'Тёплая (warm)',
+                                        'dark' => 'Тёмная (dark)',
+                                    ])
+                                    ->default('warm')
+                                    ->required()
+                                    ->helperText('Используется для новых посетителей. Если у пользователя уже сохранена тема в браузере (localStorage), она имеет приоритет.'),
                                 Toggle::make('show_header')->label('Показывать Header')->default(true),
                                 Toggle::make('show_hero')->label('Показывать Hero')->default(true),
                                 Toggle::make('show_about')->label('Показывать About')->default(true),
