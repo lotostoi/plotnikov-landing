@@ -7,6 +7,7 @@ use App\Models\LandingPageContent;
 use Database\Seeders\LandingBlocksSeeder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class LandingPageController extends Controller
 {
@@ -17,6 +18,8 @@ class LandingPageController extends Controller
         if (! $content) {
             $content = LandingPageContent::query()->create($this->defaults());
         }
+
+        $this->recordLandingPageView($content->id);
 
         $images = [
             'hero' => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7896_resized-nd2q5Sfs8MaKUDmtG8jYjZkb33cvj6.jpeg',
@@ -415,6 +418,20 @@ class LandingPageController extends Controller
         $block = $blocks->firstWhere('block_key', $key);
 
         return $block;
+    }
+
+    /**
+     * Счётчик для личного контроля в админке. Обновление через query builder,
+     * чтобы не трогать updated_at (он участвует в lastmod sitemap).
+     */
+    private function recordLandingPageView(int $contentId): void
+    {
+        DB::table('landing_page_contents')
+            ->where('id', $contentId)
+            ->update([
+                'landing_page_views_count' => DB::raw('landing_page_views_count + 1'),
+                'landing_page_last_view_at' => now(),
+            ]);
     }
 }
 

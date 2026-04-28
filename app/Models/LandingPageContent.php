@@ -103,6 +103,9 @@ class LandingPageContent extends Model
         'show_faq' => 'boolean',
         'show_contacts' => 'boolean',
         'show_footer' => 'boolean',
+
+        'landing_page_views_count' => 'integer',
+        'landing_page_last_view_at' => 'datetime',
     ];
 
     public function blocks()
