@@ -24,5 +24,8 @@ php artisan route:cache
 php artisan view:cache
 php artisan event:cache
 
+# Named volume storage_data часто root:root; artisan выше тоже root — иначе www-data не пишет в views (tempnam / Blade → 500).
+chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true
+
 echo "[entrypoint] Starting php-fpm..."
 exec "$@"
