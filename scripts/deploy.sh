@@ -20,6 +20,6 @@ sleep 3
 
 echo "[deploy] running artisan tasks"
 docker compose exec -T app php artisan migrate --force
-docker compose exec -T app php artisan storage:link || true
+docker compose exec -T app php artisan storage:link --force
 
 echo "[deploy] done"
