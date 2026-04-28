@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Article;
 use App\Models\LandingBlock;
 use App\Models\LandingPageContent;
 use Database\Seeders\LandingBlocksSeeder;
@@ -172,21 +173,10 @@ class LandingPageController extends Controller
             ->values()
             ->all();
 
-        $articles = $blogBlocks
-            ->where('block_type', 'article')
-            ->map(function (LandingBlock $block): array {
-                $meta = is_array($block->meta) ? $block->meta : [];
-
-                return [
-                    'title' => $block->title ?: '',
-                    'description' => $block->body ?: '',
-                    'category' => $block->badge ?: '',
-                    'date' => (string) ($meta['date'] ?? ''),
-                    'readTime' => (string) ($meta['readTime'] ?? ''),
-                ];
-            })
-            ->values()
-            ->all();
+        $articles = Article::published()
+            ->latest('published_at')
+            ->limit(3)
+            ->get();
 
         $faqs = $faqBlocks
             ->where('block_type', 'faq')
@@ -310,7 +300,7 @@ class LandingPageController extends Controller
             ],
             'blogAllCta' => [
                 'text' => $blogAllCta?->button_text ?: 'Все статьи',
-                'url' => $blogAllCta?->button_url ?: '#',
+                'url' => route('blog.index'),
             ],
             'articles' => $articles,
 

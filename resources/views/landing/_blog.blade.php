@@ -17,32 +17,53 @@
             </a>
         </div>
 
-        <div class="grid gap-8 md:grid-cols-3">
-            @foreach ($articles as $article)
-                <article class="card card-hover overflow-hidden cursor-pointer"
-                         data-reveal data-reveal-group="blog-cards">
-                    <div class="gradient-strip"></div>
-                    <div class="space-y-4 p-6 pb-2">
-                        <div class="flex items-center gap-3">
-                            <span class="badge theme-accent-light">{{ $article['category'] }}</span>
-                            <span class="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                                <i data-lucide="clock" style="width:12px;height:12px"></i>
-                                {{ $article['readTime'] }}
-                            </span>
+        @if ($articles->isNotEmpty())
+            <div class="grid gap-8 md:grid-cols-3">
+                @foreach ($articles as $article)
+                    <a href="{{ route('blog.show', $article->slug) }}"
+                       class="card card-hover overflow-hidden group block"
+                       data-reveal data-reveal-group="blog-cards">
+                        @if ($article->cover_image_url)
+                            <div class="aspect-video overflow-hidden">
+                                <img src="{{ $article->cover_image_url }}" alt="{{ $article->title }}"
+                                     class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            </div>
+                        @else
+                            <div class="gradient-strip"></div>
+                        @endif
+                        <div class="space-y-3 p-6 pb-2">
+                            <div class="flex items-center gap-3">
+                                @if ($article->category)
+                                    <span class="badge theme-accent-light">{{ $article->category }}</span>
+                                @endif
+                                @if ($article->read_time)
+                                    <span class="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                                        <i data-lucide="clock" style="width:12px;height:12px"></i>
+                                        {{ $article->read_time }}
+                                    </span>
+                                @endif
+                            </div>
+                            <h3 class="text-lg font-bold text-foreground leading-snug">
+                                {{ $article->title }}
+                            </h3>
                         </div>
-                        <h3 class="text-lg font-bold text-foreground transition-colors duration-300 group-hover:theme-gradient-text">
-                            {{ $article['title'] }}
-                        </h3>
-                    </div>
-                    <div class="space-y-4 px-6 pb-6">
-                        <p class="text-base text-muted-foreground">{{ $article['description'] }}</p>
-                        <div class="flex items-center gap-1 text-sm text-muted-foreground">
-                            <i data-lucide="calendar" style="width:14px;height:14px"></i>
-                            {{ $article['date'] }}
+                        <div class="space-y-3 px-6 pb-6">
+                            @if ($article->excerpt)
+                                <p class="text-sm text-muted-foreground line-clamp-3">{{ $article->excerpt }}</p>
+                            @endif
+                            <div class="flex items-center gap-1 text-xs text-muted-foreground">
+                                <i data-lucide="calendar" style="width:13px;height:13px"></i>
+                                {{ $article->published_at?->translatedFormat('d F Y') ?? '' }}
+                            </div>
                         </div>
-                    </div>
-                </article>
-            @endforeach
-        </div>
+                    </a>
+                @endforeach
+            </div>
+        @else
+            <div class="flex flex-col items-center justify-center py-16 text-center opacity-60">
+                <i data-lucide="file-text" style="width:40px;height:40px;color:var(--muted-foreground);margin-bottom:.75rem;"></i>
+                <p class="text-muted-foreground">Статьи скоро появятся</p>
+            </div>
+        @endif
     </div>
 </section>
