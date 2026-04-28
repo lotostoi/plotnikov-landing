@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\ContentSections\EducationBlocksResource\Pages;
 
 use App\Filament\Resources\ContentSections\EducationBlocksResource;
-use Filament\Resources\Pages\ManageRecords;
+use Filament\Resources\Pages\CreateRecord;
 
-class ManageEducationBlocks extends ManageRecords
+class CreateEducationBlock extends CreateRecord
 {
     protected static string $resource = EducationBlocksResource::class;
 }
-

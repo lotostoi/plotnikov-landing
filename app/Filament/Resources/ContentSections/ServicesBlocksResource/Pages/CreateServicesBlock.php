@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\ContentSections\ServicesBlocksResource\Pages;
 
 use App\Filament\Resources\ContentSections\ServicesBlocksResource;
-use Filament\Resources\Pages\ManageRecords;
+use Filament\Resources\Pages\CreateRecord;
 
-class ManageServicesBlocks extends ManageRecords
+class CreateServicesBlock extends CreateRecord
 {
     protected static string $resource = ServicesBlocksResource::class;
 }
-

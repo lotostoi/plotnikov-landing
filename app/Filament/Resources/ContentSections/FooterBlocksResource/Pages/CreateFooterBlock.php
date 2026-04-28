@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\ContentSections\FooterBlocksResource\Pages;
 
 use App\Filament\Resources\ContentSections\FooterBlocksResource;
-use Filament\Resources\Pages\ManageRecords;
+use Filament\Resources\Pages\CreateRecord;
 
-class ManageFooterBlocks extends ManageRecords
+class CreateFooterBlock extends CreateRecord
 {
     protected static string $resource = FooterBlocksResource::class;
 }
-

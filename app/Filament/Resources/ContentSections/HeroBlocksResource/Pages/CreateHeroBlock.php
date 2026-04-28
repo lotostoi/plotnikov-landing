@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\ContentSections\HeroBlocksResource\Pages;
 
 use App\Filament\Resources\ContentSections\HeroBlocksResource;
-use Filament\Resources\Pages\ManageRecords;
+use Filament\Resources\Pages\CreateRecord;
 
-class ManageHeroBlocks extends ManageRecords
+class CreateHeroBlock extends CreateRecord
 {
     protected static string $resource = HeroBlocksResource::class;
 }
-

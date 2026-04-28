@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\ContentSections\AboutBlocksResource\Pages;
 
 use App\Filament\Resources\ContentSections\AboutBlocksResource;
-use Filament\Resources\Pages\ManageRecords;
+use Filament\Resources\Pages\CreateRecord;
 
-class ManageAboutBlocks extends ManageRecords
+class CreateAboutBlock extends CreateRecord
 {
     protected static string $resource = AboutBlocksResource::class;
 }
-

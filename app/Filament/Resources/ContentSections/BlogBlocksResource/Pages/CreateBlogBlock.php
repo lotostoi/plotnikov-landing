@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\ContentSections\BlogBlocksResource\Pages;
 
 use App\Filament\Resources\ContentSections\BlogBlocksResource;
-use Filament\Resources\Pages\ManageRecords;
+use Filament\Resources\Pages\CreateRecord;
 
-class ManageBlogBlocks extends ManageRecords
+class CreateBlogBlock extends CreateRecord
 {
     protected static string $resource = BlogBlocksResource::class;
 }
-
