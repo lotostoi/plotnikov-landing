@@ -19,7 +19,10 @@ echo "[deploy] waiting for php-fpm to be ready..."
 sleep 3
 
 echo "[deploy] running artisan tasks"
+# Старый bootstrap/cache/config.php иначе держит DB_DATABASE=database/database.sqlite → readonly + сессии в SQLite.
+docker compose exec -T app php artisan config:clear
 docker compose exec -T app php artisan migrate --force
+docker compose exec -T app php artisan config:cache
 docker compose exec -T app php artisan storage:link --force
 
 echo "[deploy] done"
