@@ -3,12 +3,11 @@ services:
     build:
       context: .
       dockerfile: docker/php/Dockerfile
-    container_name: site_laravel_app
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
     ports:
-      - "8080:8080"
+      - "${APP_PORT:-18080}:8080"
     environment:
       APP_ENV: ${APP_ENV:-production}
       APP_DEBUG: ${APP_DEBUG:-false}

@@ -3,7 +3,7 @@
 set -euo pipefail
 
 APP_DIR="${APP_DIR:-/var/www/plotnikov-landing}"
-REPO_SSH="${REPO_SSH:-git@github.com:YOUR_GITHUB_LOGIN/plotnikov-landing.git}"
+REPO_SSH="${REPO_SSH:-git@github.com:lotostoi/plotnikov-landing.git}"
 BRANCH="${BRANCH:-main}"
 
 echo "[bootstrap] installing packages"
@@ -30,7 +30,7 @@ if [ ! -f ".env" ]; then
 fi
 
 echo "[bootstrap] generating app key if empty"
-if ! rg -n "^APP_KEY=base64:" .env >/dev/null; then
+if ! grep -Eq "^APP_KEY=base64:" .env; then
   docker compose run --rm app php artisan key:generate
 fi
 
