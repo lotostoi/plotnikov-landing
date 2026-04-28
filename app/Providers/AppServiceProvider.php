@@ -28,8 +28,8 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Сессии/кэш в SQLite на Docker с read-only database.sqlite ломают вход в Filament
-     * (каждый запрос новая сессия, CSRF/логин «молча»). Переопределяем даже при устаревшем config:cache.
+     * SQLite + Docker: сессии в БД (readonly) или в files (права на storage) дают «форма логина просто перезагружается».
+     * В production для sqlite — cookie-сессия (в зашифрованной куке), без записи на диск и без таблицы sessions.
      */
     private function normalizeDriversForSqlite(): void
     {
@@ -37,7 +37,9 @@ class AppServiceProvider extends ServiceProvider
             return;
         }
 
-        if (config('session.driver') === 'database') {
+        if (! $this->app->environment('local', 'testing')) {
+            config(['session.driver' => 'cookie']);
+        } elseif (config('session.driver') === 'database') {
             config(['session.driver' => 'file']);
         }
 
