@@ -56,6 +56,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Force HTTPS URLs
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, URL generation helpers (like asset()) will prefer HTTPS.
+    | This is especially useful behind TLS-terminating reverse proxies (Caddy,
+    | Nginx, Cloudflare) when APP_URL is still http:// during rollout.
+    |
+    */
+
+    'force_https' => (bool) env('FORCE_HTTPS', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |
