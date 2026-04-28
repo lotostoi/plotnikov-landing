@@ -11,7 +11,6 @@ use App\Models\Article;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction as TableDeleteAction;
@@ -72,13 +71,6 @@ class ArticleResource extends Resource
                         ->label('Время чтения')
                         ->placeholder('5 мин')
                         ->maxLength(50),
-
-                    Textarea::make('excerpt')
-                        ->label('Краткое описание')
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->helperText('Показывается на главной и в списке статей')
-                        ->columnSpanFull(),
                 ]),
 
             Section::make('Обложка')
@@ -86,6 +78,7 @@ class ArticleResource extends Resource
                     FileUpload::make('cover_image')
                         ->label('Фото обложки')
                         ->image()
+                        ->disk('public')
                         ->directory('articles')
                         ->imagePreviewHeight('200')
                         ->helperText('Рекомендуемый размер: 1200×630 px'),

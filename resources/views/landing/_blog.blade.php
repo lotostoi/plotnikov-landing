@@ -48,8 +48,8 @@
                             </h3>
                         </div>
                         <div class="space-y-3 px-6 pb-6">
-                            @if ($article->excerpt)
-                                <p class="text-sm text-muted-foreground line-clamp-3">{{ $article->excerpt }}</p>
+                            @if ($article->snippet)
+                                <p class="text-sm text-muted-foreground line-clamp-3">{{ $article->snippet }}</p>
                             @endif
                             <div class="flex items-center gap-1 text-xs text-muted-foreground">
                                 <i data-lucide="calendar" style="width:13px;height:13px"></i>

@@ -52,7 +52,8 @@ class MainContentPage extends BaseSettingsPage
                         ->placeholder('Владивосток, Артём')
                         ->maxLength(255),
                     TextInput::make('telegram_url')
-                        ->label('Ссылка Telegram')
+                        ->label('Telegram — личные сообщения (запасная ссылка)')
+                        ->helperText('Если в секции «Контакты» не задана ссылка на личку, используется это значение.')
                         ->url()
                         ->maxLength(255),
                     TextInput::make('whatsapp_url')

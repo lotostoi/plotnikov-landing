@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Article;
 use App\Models\LandingBlock;
 use App\Models\LandingPageContent;
+use App\Models\LandingPageViewLog;
 use Database\Seeders\LandingBlocksSeeder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
@@ -64,7 +65,10 @@ class LandingPageController extends Controller
         $contactsFreeCall = $this->findByKey($contactBlocks, 'free_call');
         $contactsTelegram = $this->findByKey($contactBlocks, 'cta_telegram');
         $contactsWhatsapp = $this->findByKey($contactBlocks, 'cta_whatsapp');
+        $contactsMax            = $this->findByKey($contactBlocks, 'cta_max');
+        $contactsTelegramChannel = $this->findByKey($contactBlocks, 'telegram_channel');
         $contactsNickname = $this->findByKey($contactBlocks, 'nickname');
+        $contactsPhone    = $this->findByKey($contactBlocks, 'phone');
         $contactsLocation = $this->findByKey($contactBlocks, 'location');
         $footerBrand = $this->findByKey($footerBlocks, 'brand');
         $footerCopyright = $this->findByKey($footerBlocks, 'copyright');
@@ -327,19 +331,51 @@ class LandingPageController extends Controller
                 'description' => $contactsFreeCall?->body ?: 'Можно предварительно созвониться — просто познакомиться и понять, подходим ли мы друг другу. Это бесплатно и ни к чему не обязывает.',
             ],
             'contactsTelegram' => [
-                'text' => $contactsTelegram?->button_text ?: 'Telegram',
-                'url' => $contactsTelegram?->button_url ?: $content->telegram_url,
+                'text' => $this->telegramCtaButtonLabel($contactsTelegram?->button_text),
+                'url'  => $contactsTelegram?->button_url ?: $content->telegram_url,
                 'icon' => $contactsTelegram?->label ?: 'send',
+            ],
+            'contactsTelegramChannel' => [
+                'title'       => $contactsTelegramChannel?->title ?: 'Читайте обо мне в Telegram',
+                'subtitle'    => $contactsTelegramChannel?->subtitle ?: 'Статьи, заметки и мысли о терапии и отношениях',
+                'button_text' => $contactsTelegramChannel?->button_text ?: 'Открыть канал',
+                'url'         => $contactsTelegramChannel?->button_url ?: 'https://t.me/plotnikov_aleksander',
+                'icon'        => $contactsTelegramChannel?->label ?: 'newspaper',
+                'visible'     => $contactsTelegramChannel?->is_visible ?? true,
             ],
             'contactsWhatsapp' => [
                 'text' => $contactsWhatsapp?->button_text ?: 'WhatsApp',
                 'url' => $contactsWhatsapp?->button_url ?: $content->whatsapp_url,
                 'icon' => $contactsWhatsapp?->label ?: 'message-circle',
             ],
-            'contactsNickname' => [
-                'label' => $contactsNickname?->label ?: 'Никнейм',
-                'value' => $contactsNickname?->title ?: $content->contact_handle,
+            'contactsMax' => [
+                'text' => $contactsMax?->button_text ?: 'Max',
+                'url'  => $contactsMax?->button_url ?: 'https://max.ru/u/f9LHodD0cOIZh45J-Dg2owlXzPWe-IUg2R7DDGo-yx1QdDAdLYK1SUWEHxM',
+                'icon' => $contactsMax?->label ?: 'message-square',
             ],
+            'contactsNickname' => [
+                'label' => $contactsNickname?->label ?: 'Ник в Telegram',
+                'value' => $contactsNickname?->title ?: '@AlexanderP_V',
+            ],
+            'contactsPhone' => [
+                'number' => $contactsPhone?->title ?: '+7 924 252-17-56',
+                'url'    => $contactsPhone?->button_url ?: 'tel:+79242521756',
+            ],
+            'footerSocial' => [
+                'telegram_personal' => $contactsTelegram?->button_url ?: $content->telegram_url,
+                'telegram_channel'  => $contactsTelegramChannel?->button_url ?: 'https://t.me/plotnikov_aleksander',
+                'whatsapp'          => $contactsWhatsapp?->button_url ?: $content->whatsapp_url,
+                'max'               => $contactsMax?->button_url ?: 'https://max.ru/u/f9LHodD0cOIZh45J-Dg2owlXzPWe-IUg2R7DDGo-yx1QdDAdLYK1SUWEHxM',
+            ],
+            'schemaSocialUrls' => array_values(array_unique(array_filter([
+                $contactsTelegram?->button_url ?: $content->telegram_url,
+                $contactsTelegramChannel?->button_url ?: 'https://t.me/plotnikov_aleksander',
+                $contactsWhatsapp?->button_url ?: $content->whatsapp_url,
+                $contactsMax?->button_url ?: 'https://max.ru/u/f9LHodD0cOIZh45J-Dg2owlXzPWe-IUg2R7DDGo-yx1QdDAdLYK1SUWEHxM',
+                $content->vk_url,
+                $content->youtube_url,
+                $content->instagram_url,
+            ]))),
             'contactsLocation' => [
                 'title' => $contactsLocation?->title ?: 'Очный приём',
                 'subtitle' => $contactsLocation?->subtitle ?: $content->location_text,
@@ -368,7 +404,7 @@ class LandingPageController extends Controller
             'hero_description' => 'Уже 15 лет моя жизнь связана с психологией. Помогаю людям находить опору и контакт с собой через доверие и живое человеческое присутствие.',
             'contact_handle' => '@AlexanderP_V',
             'telegram_url' => 'https://t.me/AlexanderP_V',
-            'whatsapp_url' => 'https://wa.me/message/AlexanderP_V',
+            'whatsapp_url' => 'https://wa.me/79242521756',
             'location_text' => 'Владивосток, Артём',
             'seo_title' => 'Александр Психолог | Гештальт-терапия онлайн и очно',
             'seo_description' => 'Психолог, гештальт-терапевт. Помогаю найти опору и контакт с собой. Работаю с тревожностью, отношениями, кризисами и самоценностью. Онлайн и очно во Владивостоке.',
@@ -405,6 +441,21 @@ class LandingPageController extends Controller
         ];
     }
 
+    /**
+     * Убирает устаревший префикс «Написать в …» из текста кнопки (значение могло остаться в БД).
+     */
+    private function telegramCtaButtonLabel(?string $buttonText): string
+    {
+        $raw = trim((string) $buttonText);
+        if ($raw === '') {
+            return 'Telegram';
+        }
+
+        $stripped = preg_replace('/^написать\s+в\s+/iu', '', $raw);
+
+        return trim((string) $stripped) !== '' ? trim((string) $stripped) : 'Telegram';
+    }
+
     private function findByKey(Collection $blocks, string $key): ?LandingBlock
     {
         /** @var LandingBlock|null $block */
@@ -425,6 +476,13 @@ class LandingPageController extends Controller
                 'landing_page_views_count' => DB::raw('landing_page_views_count + 1'),
                 'landing_page_last_view_at' => now(),
             ]);
+
+        if (Schema::hasTable('landing_page_view_logs')) {
+            LandingPageViewLog::query()->create([
+                'landing_page_content_id' => $contentId,
+                'viewed_at'                 => now(),
+            ]);
+        }
     }
 }
 

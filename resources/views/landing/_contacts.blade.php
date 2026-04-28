@@ -37,24 +37,50 @@
                     </p>
                 </div>
 
-                {{-- Кнопки мессенджеров --}}
+                {{-- Кнопки мессенджеров (личный Telegram, не канал) --}}
                 <div class="space-y-4" data-reveal data-reveal-delay="300">
                     <p class="font-semibold text-foreground">Напишите мне:</p>
-                    <div class="flex flex-col gap-4 sm:flex-row">
+                    <div class="flex flex-col flex-wrap gap-4 sm:flex-row">
                         <a href="{{ $contactsTelegram['url'] }}" target="_blank" rel="noopener noreferrer"
-                           class="btn btn-lg btn-telegram flex-1">
+                           class="btn btn-lg btn-telegram flex-1 min-w-[10rem]">
                             <i data-lucide="{{ $contactsTelegram['icon'] }}" style="width:20px;height:20px"></i>
                             <span>{{ $contactsTelegram['text'] }}</span>
                         </a>
                         <a href="{{ $contactsWhatsapp['url'] }}" target="_blank" rel="noopener noreferrer"
-                           class="btn btn-lg btn-whatsapp flex-1">
+                           class="btn btn-lg btn-whatsapp flex-1 min-w-[10rem]">
                             <i data-lucide="{{ $contactsWhatsapp['icon'] }}" style="width:20px;height:20px"></i>
                             <span>{{ $contactsWhatsapp['text'] }}</span>
                         </a>
+                        <a href="{{ $contactsMax['url'] }}" target="_blank" rel="noopener noreferrer"
+                           class="btn btn-lg btn-max flex-1 min-w-[10rem]">
+                            <i data-lucide="{{ $contactsMax['icon'] }}" style="width:20px;height:20px"></i>
+                            <span>{{ $contactsMax['text'] }}</span>
+                        </a>
                     </div>
-                    <p class="text-sm text-muted-foreground">
-                        {{ $contactsNickname['label'] }}: <span class="font-semibold theme-gradient-text-amber">{{ $contactsNickname['value'] }}</span>
-                    </p>
+
+                    @if ($contactsTelegramChannel['visible'] && !empty($contactsTelegramChannel['url']))
+                        <a href="{{ $contactsTelegramChannel['url'] }}" target="_blank" rel="noopener noreferrer"
+                           class="tg-channel-card group flex gap-4 rounded-2xl border border-border bg-card/80 p-4 transition-all hover:border-[#0088cc]/40 hover:shadow-md">
+                            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                                 style="background: linear-gradient(135deg, #0088cc22, #00a8e822);">
+                                <i data-lucide="{{ $contactsTelegramChannel['icon'] }}" style="width:22px;height:22px;color:#0088cc"></i>
+                            </div>
+                            <div class="min-w-0 flex-1 space-y-1">
+                                <p class="text-sm font-bold text-foreground leading-snug">{{ $contactsTelegramChannel['title'] }}</p>
+                                <p class="text-xs text-muted-foreground leading-relaxed">{{ $contactsTelegramChannel['subtitle'] }}</p>
+                                <span class="inline-flex items-center gap-1 text-sm font-semibold theme-gradient-text pt-1">
+                                    {{ $contactsTelegramChannel['button_text'] }}
+                                    <i data-lucide="arrow-right" style="width:14px;height:14px;transition:transform .2s" class="group-hover:translate-x-0.5"></i>
+                                </span>
+                            </div>
+                        </a>
+                    @endif
+
+                    <a href="{{ $contactsPhone['url'] }}"
+                       class="inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:opacity-75 transition-opacity">
+                        <i data-lucide="phone" style="width:15px;height:15px;color:var(--theme-gradient-from)"></i>
+                        {{ $contactsPhone['number'] }}
+                    </a>
                 </div>
 
                 {{-- Локация --}}

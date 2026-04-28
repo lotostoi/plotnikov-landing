@@ -13,14 +13,18 @@
                 <p class="max-w-md leading-relaxed" style="color: rgba(255,255,255,.7)">
                     {{ $footerBrand['description'] }}
                 </p>
-                <div class="flex gap-3">
-                    <a href="{{ $content->telegram_url }}" target="_blank" rel="noopener noreferrer"
+                <div class="flex flex-wrap gap-3">
+                    <a href="{{ $footerSocial['telegram_personal'] }}" target="_blank" rel="noopener noreferrer"
                        class="social-square social-telegram" aria-label="Telegram">
                         <i data-lucide="send" style="width:20px;height:20px"></i>
                     </a>
-                    <a href="{{ $content->whatsapp_url }}" target="_blank" rel="noopener noreferrer"
+                    <a href="{{ $footerSocial['whatsapp'] }}" target="_blank" rel="noopener noreferrer"
                        class="social-square social-whatsapp" aria-label="WhatsApp">
                         <i data-lucide="message-circle" style="width:20px;height:20px"></i>
+                    </a>
+                    <a href="{{ $footerSocial['max'] }}" target="_blank" rel="noopener noreferrer"
+                       class="social-square social-max" aria-label="Max">
+                        <i data-lucide="message-square" style="width:20px;height:20px"></i>
                     </a>
                 </div>
             </div>

@@ -78,4 +78,18 @@ class Article extends Model
 
         return asset('storage/' . $this->cover_image);
     }
+
+    public function getSnippetAttribute(): string
+    {
+        $length = 180;
+        $text = strip_tags((string) $this->content);
+        $text = (string) preg_replace('/\s+/', ' ', $text);
+        $text = trim($text);
+
+        if (mb_strlen($text) <= $length) {
+            return $text;
+        }
+
+        return mb_substr($text, 0, $length) . '…';
+    }
 }

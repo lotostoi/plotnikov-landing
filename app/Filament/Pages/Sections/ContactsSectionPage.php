@@ -38,19 +38,38 @@ class ContactsSectionPage extends BaseSectionPage
                     Textarea::make('free_call.body')->label('Описание')->rows(3),
                 ]),
 
-            Section::make('Кнопки мессенджеров')
+            Section::make('Личные мессенджеры')
+                ->description('Кнопка Telegram — личные сообщения (не канал). Канал задаётся отдельным блоком ниже.')
                 ->columns(2)
                 ->schema([
-                    TextInput::make('cta_telegram.button_text')->label('Telegram — текст')->placeholder('Telegram')->maxLength(255),
-                    TextInput::make('cta_telegram.button_url')->label('Telegram — ссылка')->placeholder('https://t.me/...')->maxLength(500),
+                    TextInput::make('cta_telegram.button_text')->label('Telegram — текст кнопки')->placeholder('Telegram')->maxLength(255),
+                    TextInput::make('cta_telegram.button_url')->label('Telegram — ссылка (личный чат)')->placeholder('https://t.me/username')->maxLength(500),
+                    TextInput::make('cta_telegram.label')->label('Telegram — иконка Lucide')->placeholder('send')->maxLength(100),
                     TextInput::make('cta_whatsapp.button_text')->label('WhatsApp — текст')->placeholder('WhatsApp')->maxLength(255),
-                    TextInput::make('cta_whatsapp.button_url')->label('WhatsApp — ссылка')->placeholder('https://wa.me/...')->maxLength(500),
+                    TextInput::make('cta_whatsapp.button_url')->label('WhatsApp — ссылка')->placeholder('https://wa.me/7...')->maxLength(500),
+                    TextInput::make('cta_whatsapp.label')->label('WhatsApp — иконка Lucide')->placeholder('message-circle')->maxLength(100),
+                    TextInput::make('cta_max.button_text')->label('Max — текст')->placeholder('Max')->maxLength(255),
+                    TextInput::make('cta_max.button_url')->label('Max — ссылка')->placeholder('https://max.ru/u/...')->maxLength(500),
+                    TextInput::make('cta_max.label')->label('Max — иконка Lucide')->placeholder('message-square')->maxLength(100),
                 ]),
 
-            Section::make('Никнейм и локация')
+            Section::make('Telegram-канал (отдельно от лички)')
+                ->schema([
+                    TextInput::make('telegram_channel.title')->label('Заголовок карточки')->placeholder('Читайте обо мне в Telegram')->maxLength(255),
+                    TextInput::make('telegram_channel.subtitle')->label('Подзаголовок')->maxLength(255),
+                    TextInput::make('telegram_channel.button_text')->label('Текст ссылки')->placeholder('Открыть канал')->maxLength(255),
+                    TextInput::make('telegram_channel.button_url')->label('Ссылка на канал')->placeholder('https://t.me/...')->maxLength(500),
+                    TextInput::make('telegram_channel.label')->label('Иконка Lucide')->placeholder('newspaper')->maxLength(100),
+                    Toggle::make('telegram_channel.is_visible')->label('Показывать карточку канала')->default(true),
+                ]),
+
+            Section::make('Телефон, ник и локация')
                 ->columns(2)
                 ->schema([
-                    TextInput::make('nickname.title')->label('Никнейм (ссылка)')->placeholder('@AlexanderP_V')->maxLength(255),
+                    TextInput::make('phone.title')->label('Телефон (отображение)')->placeholder('+7 924 252-17-56')->maxLength(255),
+                    TextInput::make('phone.button_url')->label('Телефон — ссылка tel:')->placeholder('tel:+79242521756')->maxLength(255),
+                    TextInput::make('nickname.title')->label('Ник в Telegram (под кнопкой лички)')->placeholder('@AlexanderP_V')->maxLength(255),
+                    TextInput::make('nickname.label')->label('Подпись к нику')->placeholder('Ник в Telegram')->maxLength(255),
                     TextInput::make('location.title')->label('Локация — заголовок')->placeholder('Очный приём')->maxLength(255),
                     TextInput::make('location.subtitle')->label('Локация — адрес')->placeholder('Владивосток, Артём')->maxLength(255),
                     TextInput::make('location.label')->label('Локация — иконка (Lucide)')->placeholder('map-pin')->maxLength(100),

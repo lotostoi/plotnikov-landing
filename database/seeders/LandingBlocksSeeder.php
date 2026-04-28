@@ -94,8 +94,11 @@ class LandingBlocksSeeder extends Seeder
             ['section_code' => 'contacts', 'block_key' => 'heading', 'block_type' => 'text', 'badge' => 'Контакты', 'title' => 'Запишитесь на', 'subtitle' => 'консультацию', 'body' => 'Для записи или вопросов пишите в любой удобный мессенджер. Отвечаю в течение дня.', 'sort_order' => 10],
             ['section_code' => 'contacts', 'block_key' => 'free_call', 'block_type' => 'card', 'title' => 'Бесплатный созвон', 'subtitle' => '15 минут для знакомства', 'body' => 'Можно предварительно созвониться — просто познакомиться и понять, подходим ли мы друг другу. Это бесплатно и ни к чему не обязывает.', 'sort_order' => 20],
             ['section_code' => 'contacts', 'block_key' => 'cta_telegram', 'block_type' => 'cta', 'label' => 'send', 'button_text' => 'Telegram', 'button_url' => 'https://t.me/AlexanderP_V', 'sort_order' => 30],
-            ['section_code' => 'contacts', 'block_key' => 'cta_whatsapp', 'block_type' => 'cta', 'label' => 'message-circle', 'button_text' => 'WhatsApp', 'button_url' => 'https://wa.me/message/AlexanderP_V', 'sort_order' => 40],
-            ['section_code' => 'contacts', 'block_key' => 'nickname', 'block_type' => 'text', 'label' => 'Никнейм', 'title' => '@AlexanderP_V', 'sort_order' => 50],
+            ['section_code' => 'contacts', 'block_key' => 'cta_whatsapp', 'block_type' => 'cta', 'label' => 'message-circle', 'button_text' => 'WhatsApp', 'button_url' => 'https://wa.me/79242521756', 'sort_order' => 40],
+            ['section_code' => 'contacts', 'block_key' => 'cta_max', 'block_type' => 'cta', 'label' => 'message-square', 'button_text' => 'Max', 'button_url' => 'https://max.ru/u/f9LHodD0cOIZh45J-Dg2owlXzPWe-IUg2R7DDGo-yx1QdDAdLYK1SUWEHxM', 'sort_order' => 45],
+            ['section_code' => 'contacts', 'block_key' => 'telegram_channel', 'block_type' => 'card', 'label' => 'newspaper', 'title' => 'Читайте обо мне в Telegram', 'subtitle' => 'Статьи, заметки и мысли о терапии и отношениях', 'button_text' => 'Открыть канал', 'button_url' => 'https://t.me/plotnikov_aleksander', 'sort_order' => 47],
+            ['section_code' => 'contacts', 'block_key' => 'phone', 'block_type' => 'item', 'label' => 'phone', 'title' => '+7 924 252-17-56', 'button_url' => 'tel:+79242521756', 'sort_order' => 48],
+            ['section_code' => 'contacts', 'block_key' => 'nickname', 'block_type' => 'text', 'label' => 'Ник в Telegram', 'title' => '@AlexanderP_V', 'sort_order' => 50],
             ['section_code' => 'contacts', 'block_key' => 'location', 'block_type' => 'card', 'label' => 'map-pin', 'title' => 'Очный приём', 'subtitle' => 'Владивосток, Артём', 'sort_order' => 60],
 
             // Footer

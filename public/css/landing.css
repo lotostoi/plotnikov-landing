@@ -233,6 +233,8 @@ button { font-family: inherit; }
 .btn-telegram:hover { opacity: .92; transform: translateY(-2px); box-shadow: 0 16px 32px -10px rgba(0, 136, 204, .45); }
 .btn-whatsapp { background: linear-gradient(90deg, #25D366, #128C7E); color: #fff; box-shadow: 0 10px 24px -8px rgba(37, 211, 102, .35); }
 .btn-whatsapp:hover { opacity: .92; transform: translateY(-2px); box-shadow: 0 16px 32px -10px rgba(37, 211, 102, .45); }
+.btn-max { background: linear-gradient(90deg, #0077FF, #005fcc); color: #fff; border-color: transparent; box-shadow: 0 10px 24px -8px rgba(0, 119, 255, .35); }
+.btn-max:hover { opacity: .92; transform: translateY(-2px); box-shadow: 0 16px 32px -10px rgba(0, 119, 255, .45); }
 
 /* ===== Карточки ===== */
 .card {
@@ -619,7 +621,9 @@ button { font-family: inherit; }
 }
 .social-square:hover { transform: scale(1.1); }
 .social-telegram { background: linear-gradient(135deg, #0088cc, #00a8e8); }
+.social-telegram-channel { background: linear-gradient(135deg, #006699, #0088cc); }
 .social-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); }
+.social-max { background: linear-gradient(135deg, #0077FF, #005fcc); }
 
 /* ===== Звёздочки и микро-утилиты ===== */
 .text-balance { text-wrap: balance; }

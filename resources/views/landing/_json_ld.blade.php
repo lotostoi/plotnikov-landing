@@ -20,7 +20,7 @@
             'Трансактный анализ',
             'Процессуальная психология',
         ],
-        'sameAs' => array_values(array_filter([
+        'sameAs' => $schemaSocialUrls ?? array_values(array_filter([
             $content->telegram_url,
             $content->whatsapp_url,
             $content->vk_url,
@@ -79,7 +79,7 @@
     if (! empty($content->opening_hours)) {
         $business['openingHours'] = $content->opening_hours;
     }
-    $sameAs = array_values(array_filter([
+    $sameAs = $schemaSocialUrls ?? array_values(array_filter([
         $content->telegram_url, $content->whatsapp_url, $content->vk_url,
         $content->youtube_url, $content->instagram_url,
     ]));
