@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\LandingBlock;
 use App\Models\LandingPageContent;
+use Database\Seeders\LandingBlocksSeeder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 
@@ -23,6 +24,10 @@ class LandingPageController extends Controller
             'education' => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7906_resized-HaErVaZcvFJVFnHdfUL8pDRBTSodQq.jpeg',
             'contacts' => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7900_resized-4RkFl3kS879RMqqDHNSTMuqrYSE6C9.jpeg',
         ];
+
+        if (! LandingBlock::query()->exists()) {
+            (new LandingBlocksSeeder)->run();
+        }
 
         $visibleBlocks = LandingBlock::query()->visible()->ordered()->get()->groupBy('section_code');
 
