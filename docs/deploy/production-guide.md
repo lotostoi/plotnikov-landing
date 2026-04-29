@@ -94,8 +94,10 @@ docker compose run --rm app php artisan key:generate --show
 ### 5. Заполнить базу данных дефолтными данными
 
 ```bash
-docker compose exec -T app php artisan db:seed
+docker compose exec -T app php artisan db:seed --force
 ```
+
+> `--force` обязателен на проде — без него Laravel отменит команду с предупреждением.
 
 ### 6. Создать администратора
 
@@ -209,14 +211,14 @@ docker compose exec -T app php artisan migrate:rollback
 docker compose exec -T app php artisan migrate:status
 
 # Сбросить БД и прогнать всё заново (ТОЛЬКО НА ЛОКАЛИ!)
-docker compose exec -T app php artisan migrate:fresh --seed
+docker compose exec -T app php artisan migrate:fresh --seed --force
 
-# Заполнить БД сидерами (без сброса)
-docker compose exec -T app php artisan db:seed
+# Заполнить БД сидерами (без сброса) — --force обязателен на проде
+docker compose exec -T app php artisan db:seed --force
 
 # Заполнить конкретным сидером
-docker compose exec -T app php artisan db:seed --class=LandingContentSeeder
-docker compose exec -T app php artisan db:seed --class=LandingBlocksSeeder
+docker compose exec -T app php artisan db:seed --class=LandingContentSeeder --force
+docker compose exec -T app php artisan db:seed --class=LandingBlocksSeeder --force
 
 # Кэш
 docker compose exec -T app php artisan config:cache
@@ -257,6 +259,8 @@ docker compose exec -i db mysql -u app -pПАРОЛЬ plotnikov_landing < backup
 
 Сидеры заполняют БД дефолтными данными. Безопасно запускать повторно — используют `updateOrCreate`.
 
+> **Важно:** на проде всегда добавляйте флаг `--force`, иначе Laravel отменит выполнение с предупреждением «APPLICATION IN PRODUCTION».
+
 ### Что заполняют
 
 | Сидер | Данные |
@@ -267,23 +271,23 @@ docker compose exec -i db mysql -u app -pПАРОЛЬ plotnikov_landing < backup
 ### Запуск всех сидеров
 
 ```bash
-docker compose exec -T app php artisan db:seed
+docker compose exec -T app php artisan db:seed --force
 ```
 
 ### Запуск конкретного сидера
 
 ```bash
 # Только контент страницы (SEO, персона)
-docker compose exec -T app php artisan db:seed --class=LandingContentSeeder
+docker compose exec -T app php artisan db:seed --class=LandingContentSeeder --force
 
 # Только блоки лендинга (секции)
-docker compose exec -T app php artisan db:seed --class=LandingBlocksSeeder
+docker compose exec -T app php artisan db:seed --class=LandingBlocksSeeder --force
 ```
 
 ### Полный сброс и пересев (ТОЛЬКО НА ЛОКАЛИ)
 
 ```bash
-docker compose exec -T app php artisan migrate:fresh --seed
+docker compose exec -T app php artisan migrate:fresh --seed --force
 ```
 
 ---
@@ -368,4 +372,36 @@ docker compose logs db
 docker compose restart db
 # Если том повреждён (только если не жалко данные):
 docker compose down -v && docker compose up -d --build
+```
+
+### `git reset` при деплое — Permission denied
+
+**Симптом:**
+```
+error: unable to unlink old 'bootstrap/cache/.gitignore': Permission denied
+fatal: Could not reset index file to revision 'origin/main'.
+```
+
+**Причина:** Docker контейнер записал файлы в `bootstrap/cache/` или `storage/` от имени `root`/`www-data`, а деплой-скрипт работает от имени вашего пользователя.
+
+**Решение:**
+```bash
+sudo chown -R $(whoami) bootstrap/cache/ storage/
+git reset --hard origin/main
+./scripts/deploy.sh
+```
+
+**Чтобы не повторялось** — добавьте в `scripts/deploy.sh` перед `git reset`:
+```bash
+sudo chown -R $(whoami) bootstrap/cache/ storage/ 2>/dev/null || true
+```
+
+### Сидер отменяется с «APPLICATION IN PRODUCTION»
+
+```bash
+# Неправильно (на проде):
+docker compose exec -T app php artisan db:seed
+
+# Правильно:
+docker compose exec -T app php artisan db:seed --force
 ```

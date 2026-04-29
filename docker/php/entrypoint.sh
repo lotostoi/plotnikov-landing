@@ -4,6 +4,7 @@ set -e
 cd /var/www/html
 
 mkdir -p storage/app/public \
+         storage/app/livewire-tmp \
          storage/framework/cache/data \
          storage/framework/sessions \
          storage/framework/views \
@@ -53,6 +54,11 @@ else
   set -e
   chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || chown -R 82:82 storage bootstrap/cache 2>/dev/null || true
 fi
+
+echo "[entrypoint] Creating storage symlink..."
+su -s /bin/sh www-data -c "cd /var/www/html && php artisan storage:link --quiet" \
+  || php artisan storage:link --quiet \
+  || true
 
 echo "[entrypoint] Starting php-fpm..."
 exec "$@"

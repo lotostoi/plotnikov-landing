@@ -112,12 +112,18 @@ class LandingPageController extends Controller
 
         $aboutSlides = $aboutBlocks
             ->where('block_type', 'about_slide')
-            ->map(fn (LandingBlock $block): array => [
-                'icon'  => $block->label ?: 'user',
-                'title' => $block->title ?: '',
-                'body'  => $block->body ?: '',
-                'photo' => $block->button_url ?: $images['about'],
-            ])
+            ->map(function (LandingBlock $block) use ($images): array {
+                $raw   = $block->button_url ?: null;
+                $photo = $raw
+                    ? (str_starts_with($raw, 'http') ? $raw : asset('storage/' . $raw))
+                    : $images['about'];
+                return [
+                    'icon'  => $block->label ?: 'user',
+                    'title' => $block->title ?: '',
+                    'body'  => $block->body ?: '',
+                    'photo' => $photo,
+                ];
+            })
             ->values()
             ->all();
 

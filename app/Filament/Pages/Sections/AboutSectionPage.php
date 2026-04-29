@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Sections;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -89,10 +90,13 @@ class AboutSectionPage extends BaseSectionPage
                 ->placeholder($iconPlaceholder)
                 ->maxLength(100),
 
-            TextInput::make("{$key}.button_url")
-                ->label('URL фотографии')
-                ->placeholder('https://...')
-                ->maxLength(1000),
+            FileUpload::make("{$key}.button_url")
+                ->label('Фотография')
+                ->image()
+                ->disk('public')
+                ->directory('about/slides')
+                ->imagePreviewHeight('160')
+                ->downloadable(),
 
             Textarea::make("{$key}.body")
                 ->label('Текст слайда')
