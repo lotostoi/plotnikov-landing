@@ -42,36 +42,68 @@ class AboutSectionPage extends BaseSectionPage
                         ->columnSpanFull(),
                 ]),
 
-            Section::make('Текстовые абзацы')
-                ->schema([
-                    Textarea::make('paragraph_1.body')
-                        ->label('Первый абзац')
-                        ->rows(4),
-                    Textarea::make('paragraph_2.body')
-                        ->label('Второй абзац')
-                        ->rows(3),
-                ]),
-
-            Section::make('Карточки ценностей')
-                ->description('4 карточки с иконками внизу секции')
+            Section::make('Слайд 1')
+                ->description('Иконка — название из Lucide (например: message-circle, user, heart, flame, graduation-cap)')
                 ->columns(2)
-                ->schema([
-                    TextInput::make('value_1.title')->label('Карточка 1 — заголовок')->maxLength(255),
-                    TextInput::make('value_1.label')->label('Карточка 1 — иконка (Lucide)')->placeholder('heart')->maxLength(100),
-                    Textarea::make('value_1.body')->label('Карточка 1 — текст')->rows(2)->columnSpanFull(),
+                ->collapsible()
+                ->schema($this->slideSchema('slide_1', 'message-circle', 'Здравствуйте, я Александр')),
 
-                    TextInput::make('value_2.title')->label('Карточка 2 — заголовок')->maxLength(255),
-                    TextInput::make('value_2.label')->label('Карточка 2 — иконка (Lucide)')->placeholder('users')->maxLength(100),
-                    Textarea::make('value_2.body')->label('Карточка 2 — текст')->rows(2)->columnSpanFull(),
+            Section::make('Слайд 2')
+                ->columns(2)
+                ->collapsible()
+                ->collapsed()
+                ->schema($this->slideSchema('slide_2', 'user', 'Немного обо мне')),
 
-                    TextInput::make('value_3.title')->label('Карточка 3 — заголовок')->maxLength(255),
-                    TextInput::make('value_3.label')->label('Карточка 3 — иконка (Lucide)')->placeholder('briefcase')->maxLength(100),
-                    Textarea::make('value_3.body')->label('Карточка 3 — текст')->rows(2)->columnSpanFull(),
+            Section::make('Слайд 3')
+                ->columns(2)
+                ->collapsible()
+                ->collapsed()
+                ->schema($this->slideSchema('slide_3', 'heart', 'Что важно для меня')),
 
-                    TextInput::make('value_4.title')->label('Карточка 4 — заголовок')->maxLength(255),
-                    TextInput::make('value_4.label')->label('Карточка 4 — иконка (Lucide)')->placeholder('sparkles')->maxLength(100),
-                    Textarea::make('value_4.body')->label('Карточка 4 — текст')->rows(2)->columnSpanFull(),
-                ]),
+            Section::make('Слайд 4')
+                ->columns(2)
+                ->collapsible()
+                ->collapsed()
+                ->schema($this->slideSchema('slide_4', 'flame', 'Мои кризисы')),
+
+            Section::make('Слайд 5')
+                ->columns(2)
+                ->collapsible()
+                ->collapsed()
+                ->schema($this->slideSchema('slide_5', 'graduation-cap', 'Образование и опыт')),
+        ];
+    }
+
+    /** @return array<mixed> */
+    private function slideSchema(string $key, string $iconPlaceholder, string $titlePlaceholder): array
+    {
+        return [
+            TextInput::make("{$key}.title")
+                ->label('Заголовок слайда')
+                ->placeholder($titlePlaceholder)
+                ->maxLength(255)
+                ->columnSpanFull(),
+
+            TextInput::make("{$key}.label")
+                ->label('Иконка (Lucide)')
+                ->placeholder($iconPlaceholder)
+                ->maxLength(100),
+
+            TextInput::make("{$key}.button_url")
+                ->label('URL фотографии')
+                ->placeholder('https://...')
+                ->maxLength(1000),
+
+            Textarea::make("{$key}.body")
+                ->label('Текст слайда')
+                ->helperText('Абзацы разделяйте пустой строкой (два Enter)')
+                ->rows(6)
+                ->columnSpanFull(),
+
+            Toggle::make("{$key}.is_visible")
+                ->label('Показывать слайд')
+                ->default(true)
+                ->columnSpanFull(),
         ];
     }
 }

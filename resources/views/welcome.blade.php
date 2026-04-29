@@ -85,6 +85,9 @@
         @if ($sectionVisibility['services'] ?? true)
             @include('landing._services')
         @endif
+        @if ($sectionVisibility['pricing'] ?? true)
+            @include('landing._pricing')
+        @endif
         @if ($sectionVisibility['education'] ?? true)
             @include('landing._education')
         @endif

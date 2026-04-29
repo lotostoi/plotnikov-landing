@@ -32,31 +32,38 @@ class ServicesSectionPage extends BaseSectionPage
                 ]),
 
             Section::make('С чем работаю — карточки проблем')
-                ->columns(2)
+                ->description('Иконка — название из Lucide Icons. Цвет акцента: amber, rose, teal, violet, emerald, indigo.')
+                ->columns(3)
                 ->schema([
-                    TextInput::make('issue_1.title')->label('Проблема 1 — заголовок')->maxLength(255),
-                    TextInput::make('issue_1.label')->label('Иконка 1 (Lucide)')->placeholder('heart-crack')->maxLength(100),
-                    Textarea::make('issue_1.body')->label('Описание 1')->rows(2)->columnSpanFull(),
+                    TextInput::make('issue_1.title')->label('Карточка 1 — заголовок')->maxLength(255)->columnSpanFull(),
+                    TextInput::make('issue_1.label')->label('Иконка (Lucide)')->placeholder('heart-crack')->maxLength(100),
+                    TextInput::make('issue_1.badge')->label('Цвет акцента')->placeholder('rose')->maxLength(50),
+                    Textarea::make('issue_1.body')->label('Описание')->rows(2)->columnSpanFull(),
 
-                    TextInput::make('issue_2.title')->label('Проблема 2 — заголовок')->maxLength(255),
-                    TextInput::make('issue_2.label')->label('Иконка 2 (Lucide)')->placeholder('brain')->maxLength(100),
-                    Textarea::make('issue_2.body')->label('Описание 2')->rows(2)->columnSpanFull(),
+                    TextInput::make('issue_2.title')->label('Карточка 2 — заголовок')->maxLength(255)->columnSpanFull(),
+                    TextInput::make('issue_2.label')->label('Иконка (Lucide)')->placeholder('zap')->maxLength(100),
+                    TextInput::make('issue_2.badge')->label('Цвет акцента')->placeholder('amber')->maxLength(50),
+                    Textarea::make('issue_2.body')->label('Описание')->rows(2)->columnSpanFull(),
 
-                    TextInput::make('issue_3.title')->label('Проблема 3 — заголовок')->maxLength(255),
-                    TextInput::make('issue_3.label')->label('Иконка 3 (Lucide)')->placeholder('shield')->maxLength(100),
-                    Textarea::make('issue_3.body')->label('Описание 3')->rows(2)->columnSpanFull(),
+                    TextInput::make('issue_3.title')->label('Карточка 3 — заголовок')->maxLength(255)->columnSpanFull(),
+                    TextInput::make('issue_3.label')->label('Иконка (Lucide)')->placeholder('compass')->maxLength(100),
+                    TextInput::make('issue_3.badge')->label('Цвет акцента')->placeholder('teal')->maxLength(50),
+                    Textarea::make('issue_3.body')->label('Описание')->rows(2)->columnSpanFull(),
 
-                    TextInput::make('issue_4.title')->label('Проблема 4 — заголовок')->maxLength(255),
-                    TextInput::make('issue_4.label')->label('Иконка 4 (Lucide)')->placeholder('flame')->maxLength(100),
-                    Textarea::make('issue_4.body')->label('Описание 4')->rows(2)->columnSpanFull(),
+                    TextInput::make('issue_4.title')->label('Карточка 4 — заголовок')->maxLength(255)->columnSpanFull(),
+                    TextInput::make('issue_4.label')->label('Иконка (Lucide)')->placeholder('mountain-snow')->maxLength(100),
+                    TextInput::make('issue_4.badge')->label('Цвет акцента')->placeholder('violet')->maxLength(50),
+                    Textarea::make('issue_4.body')->label('Описание')->rows(2)->columnSpanFull(),
 
-                    TextInput::make('issue_5.title')->label('Проблема 5 — заголовок')->maxLength(255),
-                    TextInput::make('issue_5.label')->label('Иконка 5 (Lucide)')->placeholder('moon')->maxLength(100),
-                    Textarea::make('issue_5.body')->label('Описание 5')->rows(2)->columnSpanFull(),
+                    TextInput::make('issue_5.title')->label('Карточка 5 — заголовок')->maxLength(255)->columnSpanFull(),
+                    TextInput::make('issue_5.label')->label('Иконка (Lucide)')->placeholder('battery-low')->maxLength(100),
+                    TextInput::make('issue_5.badge')->label('Цвет акцента')->placeholder('emerald')->maxLength(50),
+                    Textarea::make('issue_5.body')->label('Описание')->rows(2)->columnSpanFull(),
 
-                    TextInput::make('issue_6.title')->label('Проблема 6 — заголовок')->maxLength(255),
-                    TextInput::make('issue_6.label')->label('Иконка 6 (Lucide)')->placeholder('users')->maxLength(100),
-                    Textarea::make('issue_6.body')->label('Описание 6')->rows(2)->columnSpanFull(),
+                    TextInput::make('issue_6.title')->label('Карточка 6 — заголовок')->maxLength(255)->columnSpanFull(),
+                    TextInput::make('issue_6.label')->label('Иконка (Lucide)')->placeholder('users-round')->maxLength(100),
+                    TextInput::make('issue_6.badge')->label('Цвет акцента')->placeholder('indigo')->maxLength(50),
+                    Textarea::make('issue_6.body')->label('Описание')->rows(2)->columnSpanFull(),
                 ]),
 
             Section::make('Форматы работы')

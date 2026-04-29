@@ -41,7 +41,8 @@ class LandingPageController extends Controller
         $headerBlocks = $visibleBlocks->get('header', collect());
         $heroBlocks = $visibleBlocks->get('hero', collect());
         $aboutBlocks = $visibleBlocks->get('about', collect());
-        $serviceBlocks = $visibleBlocks->get('services', collect());
+        $serviceBlocks  = $visibleBlocks->get('services', collect());
+        $pricingBlocks  = $visibleBlocks->get('pricing', collect());
         $educationBlocks = $visibleBlocks->get('education', collect());
         $reviewBlocks = $visibleBlocks->get('reviews', collect());
         $blogBlocks = $visibleBlocks->get('blog', collect());
@@ -109,11 +110,23 @@ class LandingPageController extends Controller
             ->values()
             ->all();
 
+        $aboutSlides = $aboutBlocks
+            ->where('block_type', 'about_slide')
+            ->map(fn (LandingBlock $block): array => [
+                'icon'  => $block->label ?: 'user',
+                'title' => $block->title ?: '',
+                'body'  => $block->body ?: '',
+                'photo' => $block->button_url ?: $images['about'],
+            ])
+            ->values()
+            ->all();
+
         $serviceIssues = $serviceBlocks
             ->filter(fn (LandingBlock $block): bool => $block->block_type === 'card' && str_starts_with($block->block_key, 'issue_'))
             ->map(fn (LandingBlock $block): array => [
-                'icon' => $block->label ?: 'sparkles',
-                'title' => $block->title ?: '',
+                'icon'        => $block->label ?: 'sparkles',
+                'accent'      => $block->badge ?: 'amber',
+                'title'       => $block->title ?: '',
                 'description' => $block->body ?: '',
             ])
             ->values()
@@ -141,13 +154,27 @@ class LandingPageController extends Controller
         }
 
         $educationItems = $educationBlocks
-            ->filter(fn (LandingBlock $block): bool => $block->block_type === 'card' && str_starts_with($block->block_key, 'edu_'))
-            ->map(fn (LandingBlock $block): array => [
-                'icon' => $block->label ?: 'graduation-cap',
-                'title' => $block->title ?: '',
-                'institution' => $block->subtitle ?: '',
-                'status' => $block->badge ?: '',
-            ])
+            ->filter(fn (LandingBlock $block): bool => $block->block_type === 'card' && str_starts_with($block->block_key, 'edu_') && !str_contains($block->block_key, '_cert_'))
+            ->map(function (LandingBlock $block) use ($educationBlocks): array {
+                $certPrefix = $block->block_key . '_cert_';
+                $certs = $educationBlocks
+                    ->filter(fn (LandingBlock $b): bool => str_starts_with($b->block_key, $certPrefix) && !empty($b->button_url))
+                    ->map(function (LandingBlock $b): string {
+                        $p = $b->button_url;
+                        return str_starts_with($p, 'http') ? $p : asset('storage/' . $p);
+                    })
+                    ->values()
+                    ->all();
+
+                return [
+                    'icon'        => $block->label ?: 'graduation-cap',
+                    'accent'      => $block->button_text ?: 'amber',
+                    'title'       => $block->title ?: '',
+                    'institution' => $block->subtitle ?: '',
+                    'status'      => $block->badge ?: '',
+                    'certs'       => $certs,
+                ];
+            })
             ->values()
             ->all();
 
@@ -200,6 +227,7 @@ class LandingPageController extends Controller
             'hero' => $content->show_hero,
             'about' => $content->show_about,
             'services' => $content->show_services,
+            'pricing' => $content->show_pricing ?? true,
             'education' => $content->show_education,
             'reviews' => $content->show_reviews,
             'blog' => $content->show_blog,
@@ -211,6 +239,7 @@ class LandingPageController extends Controller
         $navVisibilityMap = [
             '#about' => $sectionVisibility['about'],
             '#services' => $sectionVisibility['services'],
+            '#pricing' => $sectionVisibility['pricing'],
             '#education' => $sectionVisibility['education'],
             '#reviews' => $sectionVisibility['reviews'],
             '#blog' => $sectionVisibility['blog'],
@@ -270,6 +299,7 @@ class LandingPageController extends Controller
             ],
             'aboutParagraphs' => $aboutParagraphs,
             'aboutValues' => $aboutValues,
+            'aboutSlides' => $aboutSlides,
 
             'serviceHeading' => [
                 'badge' => $serviceHeading?->badge ?: 'Услуги',
@@ -279,10 +309,37 @@ class LandingPageController extends Controller
             ],
             'serviceIssues' => $serviceIssues,
             'serviceFormats' => $serviceFormats,
-            'servicePricing' => [
-                'regular' => $servicePricing->get('price_regular'),
-                'promo' => $servicePricing->get('price_promo'),
+
+            'pricingHeading' => [
+                'badge'    => $pricingBlocks->where('block_key', 'heading')->first()?->badge ?: 'Консультации',
+                'title'    => $pricingBlocks->where('block_key', 'heading')->first()?->title ?: 'Форматы',
+                'subtitle' => $pricingBlocks->where('block_key', 'heading')->first()?->subtitle ?: 'и стоимость',
             ],
+            'pricingConsults' => $pricingBlocks
+                ->where('block_type', 'consult')
+                ->map(fn (LandingBlock $b): array => [
+                    'key'         => $b->block_key,
+                    'icon'        => $b->label ?: 'video',
+                    'title'       => $b->title ?: '',
+                    'subtitle'    => $b->subtitle ?: '',
+                    'price'       => $b->badge ?: '',
+                    'body'        => $b->body ?: '',
+                    'cta_text'    => $b->button_text ?: 'Записаться',
+                    'cta_url'     => $b->button_url ?: '#contacts',
+                ])
+                ->values()
+                ->all(),
+            'pricingPromos' => $pricingBlocks
+                ->where('block_type', 'promo')
+                ->map(fn (LandingBlock $b): array => [
+                    'badge'    => $b->badge ?: 'Акция',
+                    'title'    => $b->title ?: '',
+                    'price'    => $b->subtitle ?: '',
+                    'body'     => $b->body ?: '',
+                    'terms'    => $b->button_text ?: '',
+                ])
+                ->values()
+                ->all(),
 
             'educationHeading' => [
                 'badge' => $educationHeading?->badge ?: 'Образование',
