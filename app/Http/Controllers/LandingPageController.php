@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 class LandingPageController extends Controller
 {
@@ -470,18 +471,22 @@ class LandingPageController extends Controller
      */
     private function recordLandingPageView(int $contentId): void
     {
-        DB::table('landing_page_contents')
-            ->where('id', $contentId)
-            ->update([
-                'landing_page_views_count' => DB::raw('landing_page_views_count + 1'),
-                'landing_page_last_view_at' => now(),
-            ]);
+        try {
+            DB::table('landing_page_contents')
+                ->where('id', $contentId)
+                ->update([
+                    'landing_page_views_count' => DB::raw('landing_page_views_count + 1'),
+                    'landing_page_last_view_at' => now(),
+                ]);
 
-        if (Schema::hasTable('landing_page_view_logs')) {
-            LandingPageViewLog::query()->create([
-                'landing_page_content_id' => $contentId,
-                'viewed_at'                 => now(),
-            ]);
+            if (Schema::hasTable('landing_page_view_logs')) {
+                LandingPageViewLog::query()->create([
+                    'landing_page_content_id' => $contentId,
+                    'viewed_at'                 => now(),
+                ]);
+            }
+        } catch (Throwable) {
+            // Не роняем лендинг при readonly SQLite / неверном DB_DATABASE в кэше.
         }
     }
 }

@@ -6,10 +6,9 @@ RUN apk add --no-cache \
         git \
         unzip \
         libzip-dev \
-        sqlite-dev \
         icu-dev \
         $PHPIZE_DEPS \
-    && docker-php-ext-install pdo_sqlite zip intl opcache \
+    && docker-php-ext-install pdo_mysql zip intl opcache \
     && apk del $PHPIZE_DEPS \
     && rm -rf /var/cache/apk/*
 

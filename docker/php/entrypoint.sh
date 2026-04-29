@@ -4,22 +4,11 @@ set -e
 cd /var/www/html
 
 mkdir -p storage/app/public \
-         storage/database \
          storage/framework/cache/data \
          storage/framework/sessions \
          storage/framework/views \
          storage/logs \
          bootstrap/cache
-
-# SQLite по умолчанию в storage (том); один раз копируем со старого пути, если там ещё лежит база.
-if [ ! -f storage/database/database.sqlite ]; then
-    if [ -r database/database.sqlite ]; then
-        echo "[entrypoint] copy database/database.sqlite → storage/database/database.sqlite"
-        cp -a database/database.sqlite storage/database/database.sqlite
-    else
-        touch storage/database/database.sqlite
-    fi
-fi
 
 chmod -R u+rwX,g+rwX,o+rX storage bootstrap/cache 2>/dev/null || true
 
@@ -39,6 +28,16 @@ if [ ! -f vendor/autoload.php ]; then
     echo "[entrypoint] Installing Composer dependencies..."
     composer install --no-interaction --prefer-dist --optimize-autoloader
     chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || chown -R 82:82 storage bootstrap/cache 2>/dev/null || true
+fi
+
+# Ожидаем готовности MySQL.
+if [ "${DB_CONNECTION:-mysql}" = "mysql" ]; then
+    echo "[entrypoint] Waiting for MySQL at ${DB_HOST:-db}:${DB_PORT:-3306}..."
+    until php -r "new PDO('mysql:host=${DB_HOST:-db};port=${DB_PORT:-3306};dbname=${DB_DATABASE}', '${DB_USERNAME}', '${DB_PASSWORD}');" 2>/dev/null; do
+        echo "[entrypoint] MySQL not ready, retrying in 2s..."
+        sleep 2
+    done
+    echo "[entrypoint] MySQL is ready."
 fi
 
 echo "[entrypoint] Caching config, routes, views (as www-data)..."

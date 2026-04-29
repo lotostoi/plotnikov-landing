@@ -61,7 +61,7 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi",
-            "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+            "@php -r \"$d='storage/database'; is_dir($d) || mkdir($d, 0755, true); file_exists('$d/database.sqlite') || touch('$d/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
         "pre-package-uninstall": [
