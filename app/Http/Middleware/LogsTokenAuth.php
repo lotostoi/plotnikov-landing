@@ -12,7 +12,7 @@ class LogsTokenAuth
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $expected = env('LOGS_TOKEN', '');
+        $expected = (string) config('logs.token', '');
 
         if ($expected === '' || ! hash_equals($expected, (string) $request->query('token', ''))) {
             abort(403, 'Forbidden');
