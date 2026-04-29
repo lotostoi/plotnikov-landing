@@ -11,8 +11,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('landing_page_contents', function (Blueprint $table): void {
-            $table->unsignedBigInteger('landing_page_views_count')->default(0)->after('default_theme');
-            $table->timestamp('landing_page_last_view_at')->nullable()->after('landing_page_views_count');
+            $table->unsignedBigInteger('landing_page_views_count')->default(0);
+            $table->timestamp('landing_page_last_view_at')->nullable();
         });
     }
 

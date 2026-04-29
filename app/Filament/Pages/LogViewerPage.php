@@ -11,17 +11,20 @@ use Illuminate\Support\Facades\File;
 
 class LogViewerPage extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-bug-ant';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-bug-ant';
 
-    protected static string $view = 'filament.pages.log-viewer';
+    protected string $view = 'filament.pages.log-viewer';
 
     protected static ?string $navigationLabel = 'Логи';
 
     protected static ?string $title = 'Laravel Log';
 
-    protected static ?string $navigationGroup = 'Система';
-
     protected static ?int $navigationSort = 99;
+
+    public static function getNavigationGroup(): string|null
+    {
+        return 'Система';
+    }
 
     private const LOG_FILE = 'logs/laravel.log';
 
