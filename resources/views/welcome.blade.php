@@ -37,8 +37,8 @@
     {{-- Шрифт Manrope --}}
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    {{-- Tailwind v4 (через CDN) --}}
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    {{-- Tailwind v4 (через CDN) — синхронно, до кастомного CSS --}}
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" crossorigin="anonymous"></script>
 
     {{-- Иконки Lucide --}}
     <script src="https://unpkg.com/lucide@latest" defer></script>
