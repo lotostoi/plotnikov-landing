@@ -16,7 +16,6 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
 
 class AboutSectionPage extends BaseSectionPage
@@ -189,54 +188,54 @@ class AboutSectionPage extends BaseSectionPage
                                 ->columnSpanFull(),
 
                             Placeholder::make('slide_preview')
-                                ->label('Превью на мобайле')
+                                ->label('Превью как в слайдере на телефоне')
+                                ->helperText('Те же высота блока, градиент и подложка текста, что на лендинге (мобайл). Сначала mobile-фото, иначе desktop — как <picture> на сайте.')
+                                ->dehydrated(false)
                                 ->live()
                                 ->content(function (Get $get): HtmlString {
-                                    $photo       = $get('button_url');
+                                    $photo        = $get('button_url');
                                     $photoMobile = $get('photo_mobile');
-                                    $title       = $get('title') ?: 'Заголовок слайда';
-                                    $body        = $get('body') ?: '';
+                                    $title        = $get('title') ?: 'Заголовок слайда';
+                                    $body         = $get('body') ?: '';
 
                                     $bodyPreview = mb_substr(strip_tags($body), 0, 160)
                                         . (mb_strlen($body) > 160 ? '…' : '');
 
-                                    $imageFile = $photoMobile ?: $photo;
+                                    $imageRaw = $photoMobile ?: $photo;
+                                    $url      = self::resolveSlideImageUrl($imageRaw);
 
-                                    if (is_array($imageFile)) {
-                                        $imageFile = reset($imageFile) ?: null;
-                                    }
-
-                                    if (!$imageFile) {
+                                    if ($url === null) {
                                         return new HtmlString(
-                                            '<div style="width:100%;max-width:360px;height:140px;border-radius:12px;'
+                                            '<div style="width:100%;max-width:390px;min-height:140px;border-radius:12px;'
                                             . 'background:#f3f4f6;display:flex;align-items:center;justify-content:center;'
-                                            . 'color:#9ca3af;font-size:.875rem;gap:.5rem;">'
-                                            . '📷 Загрузите фото — появится превью'
+                                            . 'color:#6b7280;font-size:.875rem;padding:1rem;text-align:center;">'
+                                            . 'Загрузите фото (desktop или mobile) — здесь будет то же кадрирование, что в слайдере.'
                                             . '</div>'
                                         );
                                     }
 
-                                    $url = Storage::disk('public')->url($imageFile);
-
+                                    // Совпадает с landing.css: .about-slider (мобайл) + градиент + текстовая карточка
                                     return new HtmlString(
-                                        '<div style="position:relative;width:100%;max-width:360px;height:460px;'
-                                        . 'border-radius:12px;overflow:hidden;font-family:sans-serif;'
-                                        . 'box-shadow:0 4px 24px rgba(0,0,0,.22);">'
+                                        '<div style="position:relative;width:100%;max-width:390px;height:min(72svh, 520px);'
+                                        . 'min-height:280px;border-radius:12px;overflow:hidden;font-family:Manrope,system-ui,sans-serif;'
+                                        . 'box-shadow:0 8px 32px rgba(0,0,0,.18);">'
 
-                                        . '<img src="' . e($url) . '" style="position:absolute;inset:0;'
+                                        . '<img src="' . e($url) . '" alt="" style="position:absolute;inset:0;'
                                         . 'width:100%;height:100%;object-fit:cover;object-position:center top;">'
 
-                                        . '<div style="position:absolute;inset:0;background:linear-gradient('
-                                        . 'to bottom,transparent 0%,transparent 25%,'
+                                        . '<div style="position:absolute;inset:0;pointer-events:none;'
+                                        . 'background:linear-gradient(to bottom,'
+                                        . 'transparent 0%,transparent 25%,'
                                         . 'rgba(0,0,0,.38) 50%,rgba(0,0,0,.74) 72%,rgba(0,0,0,.92) 100%);"></div>'
 
                                         . '<div style="position:absolute;bottom:0;left:0;right:0;'
-                                        . 'padding:.9rem 1rem 1rem;background:rgba(0,0,0,.20);'
+                                        . 'padding:1rem 1.15rem 1.1rem;'
+                                        . 'background:rgba(0,0,0,.52);'
                                         . 'backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);'
-                                        . 'border-radius:12px 12px 0 0;">'
-                                        . '<div style="color:#fff;font-size:1rem;font-weight:700;'
-                                        . 'line-height:1.2;margin-bottom:.4rem;">' . e($title) . '</div>'
-                                        . '<div style="color:rgba(255,255,255,.82);font-size:.8rem;line-height:1.5;">'
+                                        . 'border-radius:1.25rem 1.25rem 0 0;">'
+                                        . '<div style="color:#fff!important;font-size:clamp(1.15rem,4vw,1.35rem);'
+                                        . 'font-weight:700;line-height:1.15;margin-bottom:.35rem;">' . e($title) . '</div>'
+                                        . '<div style="color:rgba(255,255,255,.85)!important;font-size:.875rem;line-height:1.55;">'
                                         . e($bodyPreview) . '</div>'
                                         . '</div>'
 
@@ -255,5 +254,29 @@ class AboutSectionPage extends BaseSectionPage
                         ->columnSpanFull(),
                 ]),
         ];
+    }
+
+    /**
+     * Как в {@see LandingPageController}: путь из БД / FileUpload → URL для <img>.
+     */
+    private static function resolveSlideImageUrl(mixed $raw): ?string
+    {
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+
+        if (is_array($raw)) {
+            $raw = reset($raw);
+        }
+
+        if (! is_string($raw) || $raw === '') {
+            return null;
+        }
+
+        if (str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://')) {
+            return $raw;
+        }
+
+        return asset('storage/' . ltrim($raw, '/'));
     }
 }
