@@ -33,42 +33,50 @@ class FaqSectionPage extends BaseSectionPage
 
             Section::make('Вопрос 1')->schema([
                 TextInput::make('faq_1.title')->label('Вопрос')->maxLength(500),
-                Textarea::make('faq_1.body')->label('Ответ')->rows(4),
+                Textarea::make('faq_1.body')->label('Ответ')->rows(4)
+                    ->live(onBlur: true)->hint(fn (string $state = ''): string => mb_strlen($state) > 0 ? mb_strlen($state) . ' символов' : ''),
                 Toggle::make('faq_1.is_visible')->label('Показывать')->default(true),
             ]),
             Section::make('Вопрос 2')->schema([
                 TextInput::make('faq_2.title')->label('Вопрос')->maxLength(500),
-                Textarea::make('faq_2.body')->label('Ответ')->rows(4),
+                Textarea::make('faq_2.body')->label('Ответ')->rows(4)
+                    ->live(onBlur: true)->hint(fn (string $state = ''): string => mb_strlen($state) > 0 ? mb_strlen($state) . ' символов' : ''),
                 Toggle::make('faq_2.is_visible')->label('Показывать')->default(true),
             ]),
             Section::make('Вопрос 3')->schema([
                 TextInput::make('faq_3.title')->label('Вопрос')->maxLength(500),
-                Textarea::make('faq_3.body')->label('Ответ')->rows(4),
+                Textarea::make('faq_3.body')->label('Ответ')->rows(4)
+                    ->live(onBlur: true)->hint(fn (string $state = ''): string => mb_strlen($state) > 0 ? mb_strlen($state) . ' символов' : ''),
                 Toggle::make('faq_3.is_visible')->label('Показывать')->default(true),
             ]),
             Section::make('Вопрос 4')->schema([
                 TextInput::make('faq_4.title')->label('Вопрос')->maxLength(500),
-                Textarea::make('faq_4.body')->label('Ответ')->rows(4),
+                Textarea::make('faq_4.body')->label('Ответ')->rows(4)
+                    ->live(onBlur: true)->hint(fn (string $state = ''): string => mb_strlen($state) > 0 ? mb_strlen($state) . ' символов' : ''),
                 Toggle::make('faq_4.is_visible')->label('Показывать')->default(true),
             ]),
             Section::make('Вопрос 5')->schema([
                 TextInput::make('faq_5.title')->label('Вопрос')->maxLength(500),
-                Textarea::make('faq_5.body')->label('Ответ')->rows(4),
+                Textarea::make('faq_5.body')->label('Ответ')->rows(4)
+                    ->live(onBlur: true)->hint(fn (string $state = ''): string => mb_strlen($state) > 0 ? mb_strlen($state) . ' символов' : ''),
                 Toggle::make('faq_5.is_visible')->label('Показывать')->default(true),
             ]),
             Section::make('Вопрос 6')->schema([
                 TextInput::make('faq_6.title')->label('Вопрос')->maxLength(500),
-                Textarea::make('faq_6.body')->label('Ответ')->rows(4),
+                Textarea::make('faq_6.body')->label('Ответ')->rows(4)
+                    ->live(onBlur: true)->hint(fn (string $state = ''): string => mb_strlen($state) > 0 ? mb_strlen($state) . ' символов' : ''),
                 Toggle::make('faq_6.is_visible')->label('Показывать')->default(true),
             ]),
             Section::make('Вопрос 7')->schema([
                 TextInput::make('faq_7.title')->label('Вопрос')->maxLength(500),
-                Textarea::make('faq_7.body')->label('Ответ')->rows(4),
+                Textarea::make('faq_7.body')->label('Ответ')->rows(4)
+                    ->live(onBlur: true)->hint(fn (string $state = ''): string => mb_strlen($state) > 0 ? mb_strlen($state) . ' символов' : ''),
                 Toggle::make('faq_7.is_visible')->label('Показывать')->default(true),
             ]),
             Section::make('Вопрос 8')->schema([
                 TextInput::make('faq_8.title')->label('Вопрос')->maxLength(500),
-                Textarea::make('faq_8.body')->label('Ответ')->rows(4),
+                Textarea::make('faq_8.body')->label('Ответ')->rows(4)
+                    ->live(onBlur: true)->hint(fn (string $state = ''): string => mb_strlen($state) > 0 ? mb_strlen($state) . ' символов' : ''),
                 Toggle::make('faq_8.is_visible')->label('Показывать')->default(true),
             ]),
         ];

@@ -1,4 +1,4 @@
-<section id="about" class="about-section relative overflow-hidden">
+<section id="about" class="about-section relative overflow-x-hidden">
     <div class="about-bg"></div>
     @include('landing._floating', ['variant' => 'about'])
 
@@ -24,20 +24,19 @@
 
                         {{-- Фото --}}
                         <div class="about-slide-photo-col">
-                            <img src="{{ $slide['photo'] }}"
-                                 alt="{{ $slide['title'] }}"
-                                 class="about-slide-img"
-                                 loading="{{ $i === 0 ? 'eager' : 'lazy' }}">
+                            <picture>
+                                <source media="(max-width: 767px)" srcset="{{ $slide['photo_mobile'] }}">
+                                <img src="{{ $slide['photo'] }}"
+                                     alt="{{ $slide['title'] }}"
+                                     class="about-slide-img"
+                                     loading="{{ $i === 0 ? 'eager' : 'lazy' }}">
+                            </picture>
                         </div>
 
                         {{-- Текст --}}
                         <div class="about-slide-text-col">
                             <div class="about-slide-icon">
                                 <i data-lucide="{{ $slide['icon'] }}" style="width:22px;height:22px"></i>
-                            </div>
-                            <div class="about-slide-counter">
-                                <span class="about-slide-num">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span>
-                                <span class="about-slide-total">/ {{ str_pad(count($aboutSlides), 2, '0', STR_PAD_LEFT) }}</span>
                             </div>
                             <h3 class="about-slide-title">{{ $slide['title'] }}</h3>
                             <div class="about-slide-body">
@@ -47,6 +46,10 @@
                             </div>
                         </div>
 
+                    </div>
+                    <div class="about-slide-counter about-slide-counter--overlay">
+                        <span class="about-slide-num">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                        <span class="about-slide-total">/ {{ str_pad(count($aboutSlides), 2, '0', STR_PAD_LEFT) }}</span>
                     </div>
                 </div>
                 @endforeach

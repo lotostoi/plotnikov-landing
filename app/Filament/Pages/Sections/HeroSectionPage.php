@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Sections;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -22,6 +23,21 @@ class HeroSectionPage extends BaseSectionPage
     protected function getFormComponents(): array
     {
         return [
+            Section::make('Фотография')
+                ->description('Главное фото в хиро-секции. Если не загружено — используется фото по умолчанию.')
+                ->schema([
+                    FileUpload::make('heading.button_url')
+                        ->label('Фото (портрет)')
+                        ->image()
+                        ->disk('public')
+                        ->directory('hero')
+                        ->imagePreviewHeight('200')
+                        ->imageEditor()
+                        ->imageEditorAspectRatios(['3:4', '2:3', null])
+                        ->downloadable()
+                        ->helperText('Рекомендуется портретная ориентация (3:4). Если пусто — используется фото по умолчанию.'),
+                ]),
+
             Section::make('Заголовок')
                 ->description('Главный текст на первом экране')
                 ->columns(2)

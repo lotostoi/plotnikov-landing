@@ -6,7 +6,7 @@
         <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             {{-- Контент --}}
             <div class="flex flex-col justify-center space-y-8" data-reveal="left">
-                <div class="space-y-4">
+                <div class="space-y-4 self-start text-left">
                     <p class="text-sm font-semibold uppercase tracking-widest" style="color: var(--theme-gradient-from)">{{ $contactsHeading['badge'] }}</p>
                     <h2 class="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
                         {{ $contactsHeading['title'] }} <span class="theme-gradient-text-amber">{{ $contactsHeading['subtitle'] }}</span>

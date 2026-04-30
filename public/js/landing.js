@@ -134,8 +134,15 @@
         const targets = document.querySelectorAll('[data-reveal]');
         if (!targets.length) return;
 
+        const reveal = (el) => {
+            el.classList.add('is-revealed');
+        };
+
+        /* Hero (#top): сразу видимый — блок у низа экрана с отрицательным rootMargin часто не пересекает root, остаётся opacity:0 */
+        document.querySelectorAll('#top [data-reveal]').forEach(reveal);
+
         if (!('IntersectionObserver' in window)) {
-            targets.forEach((el) => el.classList.add('is-revealed'));
+            targets.forEach(reveal);
             return;
         }
 
@@ -153,12 +160,15 @@
                     groupCounters.set(groupKey, idx + 1);
                 }
                 el.style.transitionDelay = delay + 'ms';
-                el.classList.add('is-revealed');
+                reveal(el);
                 io.unobserve(el);
             });
-        }, { threshold: 0.12, rootMargin: '0px 0px -80px 0px' });
+        }, { threshold: 0.06, rootMargin: '0px 0px 0px 0px' });
 
-        targets.forEach((el) => io.observe(el));
+        targets.forEach((el) => {
+            if (el.closest('#top')) return;
+            io.observe(el);
+        });
     };
 
     // ---------- Smooth scroll к якорям с учётом sticky-шапки ----------

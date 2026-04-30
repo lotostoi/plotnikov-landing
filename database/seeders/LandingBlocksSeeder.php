@@ -103,7 +103,7 @@ class LandingBlocksSeeder extends Seeder
             ['section_code' => 'pricing', 'block_key' => 'heading', 'block_type' => 'text',
                 'badge' => 'Консультации', 'title' => 'Форматы', 'subtitle' => 'и стоимость', 'sort_order' => 10],
 
-            ['section_code' => 'pricing', 'block_key' => 'online', 'block_type' => 'consult',
+            ['section_code' => 'pricing', 'block_key' => 'consult_1', 'block_type' => 'consult',
                 'label' => 'video',
                 'title' => 'Онлайн-консультация',
                 'subtitle' => 'Из любой точки мира',
@@ -111,9 +111,10 @@ class LandingBlocksSeeder extends Seeder
                 'body' => "Работаю через Zoom, Telegram или WhatsApp.\nПродолжительность встречи — 55 минут.\nДля новых клиентов первая встреча оплачивается заранее.",
                 'button_text' => 'Записаться',
                 'button_url' => '#contacts',
-                'sort_order' => 20],
+                'sort_order' => 20,
+                'meta' => ['desktop_span' => 'half', 'subtitle_icon' => 'globe']],
 
-            ['section_code' => 'pricing', 'block_key' => 'offline', 'block_type' => 'consult',
+            ['section_code' => 'pricing', 'block_key' => 'consult_2', 'block_type' => 'consult',
                 'label' => 'map-pin',
                 'title' => 'Очная консультация',
                 'subtitle' => 'Владивосток, Артём',
@@ -121,7 +122,8 @@ class LandingBlocksSeeder extends Seeder
                 'body' => "Принимаю очно во Владивостоке и Артёме.\nПродолжительность встречи — 55 минут.\nАдрес и точное место — по договорённости.",
                 'button_text' => 'Записаться',
                 'button_url' => '#contacts',
-                'sort_order' => 30],
+                'sort_order' => 30,
+                'meta' => ['desktop_span' => 'half', 'subtitle_icon' => 'map-pin']],
 
             ['section_code' => 'pricing', 'block_key' => 'promo_1', 'block_type' => 'promo',
                 'badge' => 'Акция',

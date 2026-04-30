@@ -1,4 +1,4 @@
-<section id="top" class="hero-section relative overflow-hidden">
+<section id="top" class="hero-section relative overflow-x-hidden">
     <div class="hero-bg"></div>
     @include('landing._floating', ['variant' => 'hero'])
     <div class="noise-overlay"></div>
@@ -30,11 +30,11 @@
 
                 <div class="flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start hero-cta-row"
                      data-reveal data-reveal-delay="600">
-                    <a href="{{ $heroPrimaryCta['url'] }}" class="btn btn-lg btn-gradient">
+                    <a href="{{ $heroPrimaryCta['url'] }}" class="btn btn-lg btn-gradient hero-cta-primary-desktop">
                         <i data-lucide="message-circle" style="width:20px;height:20px"></i>
                         <span>{{ $heroPrimaryCta['text'] }}</span>
                     </a>
-                    <a href="{{ $heroSecondaryCta['url'] }}" class="btn btn-lg btn-outline-amber group">
+                    <a href="{{ $heroSecondaryCta['url'] }}" class="btn btn-lg btn-outline-amber group hero-cta-secondary">
                         <span>{{ $heroSecondaryCta['text'] }}</span>
                         <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
                     </a>
@@ -76,6 +76,12 @@
                     <p class="text-sm font-semibold theme-gradient-text-amber">{{ $heroFormat['text'] }}</p>
                 </div>
             </div>
+
+            {{-- Мобайл: главная CTA поверх фото, правый верх (ряд .hero-cta-row скрыт в CSS) --}}
+            <a href="{{ $heroPrimaryCta['url'] }}" class="btn btn-gradient hero-cta-primary-float">
+                <i data-lucide="message-circle" style="width:16px;height:16px"></i>
+                <span>{{ $heroPrimaryCta['text'] }}</span>
+            </a>
 
         </div>
     </div>

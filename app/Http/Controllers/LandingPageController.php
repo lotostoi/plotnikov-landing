@@ -75,6 +75,23 @@ class LandingPageController extends Controller
         $footerBrand = $this->findByKey($footerBlocks, 'brand');
         $footerCopyright = $this->findByKey($footerBlocks, 'copyright');
 
+        // Переопределяем фото секций загруженными файлами (если они есть в heading.button_url)
+        $resolvePhoto = static function (?string $raw): ?string {
+            if (empty($raw)) {
+                return null;
+            }
+            return str_starts_with($raw, 'http') ? $raw : asset('storage/' . $raw);
+        };
+        if ($uploaded = $resolvePhoto($heroHeading?->button_url)) {
+            $images['hero'] = $uploaded;
+        }
+        if ($uploaded = $resolvePhoto($educationHeading?->button_url)) {
+            $images['education'] = $uploaded;
+        }
+        if ($uploaded = $resolvePhoto($contactsHeading?->button_url)) {
+            $images['contacts'] = $uploaded;
+        }
+
         $navItems = $headerBlocks
             ->where('block_type', 'nav_item')
             ->map(fn (LandingBlock $block): array => [
@@ -117,11 +134,18 @@ class LandingPageController extends Controller
                 $photo = $raw
                     ? (str_starts_with($raw, 'http') ? $raw : asset('storage/' . $raw))
                     : $images['about'];
+
+                $rawMobile       = $block->meta['photo_mobile'] ?? null;
+                $photoMobile     = $rawMobile
+                    ? (str_starts_with($rawMobile, 'http') ? $rawMobile : asset('storage/' . $rawMobile))
+                    : $photo;
+
                 return [
-                    'icon'  => $block->label ?: 'user',
-                    'title' => $block->title ?: '',
-                    'body'  => $block->body ?: '',
-                    'photo' => $photo,
+                    'icon'         => $block->label ?: 'user',
+                    'title'        => $block->title ?: '',
+                    'body'         => $block->body ?: '',
+                    'photo'        => $photo,
+                    'photo_mobile' => $photoMobile,
                 ];
             })
             ->values()
@@ -323,17 +347,24 @@ class LandingPageController extends Controller
             ],
             'pricingConsults' => $pricingBlocks
                 ->where('block_type', 'consult')
-                ->map(fn (LandingBlock $b): array => [
-                    'key'         => $b->block_key,
-                    'icon'        => $b->label ?: 'video',
-                    'title'       => $b->title ?: '',
-                    'subtitle'    => $b->subtitle ?: '',
-                    'price'       => $b->badge ?: '',
-                    'body'        => $b->body ?: '',
-                    'cta_text'    => $b->button_text ?: 'Записаться',
-                    'cta_url'     => $b->button_url ?: '#contacts',
-                ])
+                ->sortBy('sort_order')
                 ->values()
+                ->map(function (LandingBlock $b): array {
+                    $meta = $b->meta ?? [];
+
+                    return [
+                        'key'            => $b->block_key,
+                        'icon'           => $b->label ?: 'video',
+                        'title'          => $b->title ?: '',
+                        'subtitle'       => $b->subtitle ?: '',
+                        'price'          => $b->badge ?: '',
+                        'body'           => $b->body ?: '',
+                        'cta_text'       => $b->button_text ?: 'Записаться',
+                        'cta_url'        => $b->button_url ?: '#contacts',
+                        'desktop_span'   => ($meta['desktop_span'] ?? 'half') === 'full' ? 'full' : 'half',
+                        'subtitle_icon'  => $meta['subtitle_icon'] ?? ($b->block_key === 'offline' ? 'map-pin' : 'globe'),
+                    ];
+                })
                 ->all(),
             'pricingPromos' => $pricingBlocks
                 ->where('block_type', 'promo')

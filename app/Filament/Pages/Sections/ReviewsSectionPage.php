@@ -35,7 +35,9 @@ class ReviewsSectionPage extends BaseSectionPage
                 ->schema([
                     TextInput::make('review_1.title')->label('Имя клиента')->placeholder('Анна')->maxLength(255),
                     TextInput::make('review_1.subtitle')->label('Подпись')->placeholder('6 месяцев терапии')->maxLength(255),
-                    Textarea::make('review_1.body')->label('Текст отзыва')->rows(4),
+                    Textarea::make('review_1.body')->label('Текст отзыва')->rows(4)
+                        ->live(onBlur: true)
+                        ->hint(fn (string $state = ''): string => mb_strlen($state) > 0 ? mb_strlen($state) . ' символов' : ''),
                     Toggle::make('review_1.is_visible')->label('Показывать')->default(true),
                 ]),
 
@@ -43,7 +45,9 @@ class ReviewsSectionPage extends BaseSectionPage
                 ->schema([
                     TextInput::make('review_2.title')->label('Имя клиента')->placeholder('Михаил')->maxLength(255),
                     TextInput::make('review_2.subtitle')->label('Подпись')->placeholder('8 месяцев терапии')->maxLength(255),
-                    Textarea::make('review_2.body')->label('Текст отзыва')->rows(4),
+                    Textarea::make('review_2.body')->label('Текст отзыва')->rows(4)
+                        ->live(onBlur: true)
+                        ->hint(fn (string $state = ''): string => mb_strlen($state) > 0 ? mb_strlen($state) . ' символов' : ''),
                     Toggle::make('review_2.is_visible')->label('Показывать')->default(true),
                 ]),
 
@@ -51,7 +55,9 @@ class ReviewsSectionPage extends BaseSectionPage
                 ->schema([
                     TextInput::make('review_3.title')->label('Имя клиента')->placeholder('Елена')->maxLength(255),
                     TextInput::make('review_3.subtitle')->label('Подпись')->placeholder('1 год терапии')->maxLength(255),
-                    Textarea::make('review_3.body')->label('Текст отзыва')->rows(4),
+                    Textarea::make('review_3.body')->label('Текст отзыва')->rows(4)
+                        ->live(onBlur: true)
+                        ->hint(fn (string $state = ''): string => mb_strlen($state) > 0 ? mb_strlen($state) . ' символов' : ''),
                     Toggle::make('review_3.is_visible')->label('Показывать')->default(true),
                 ]),
         ];

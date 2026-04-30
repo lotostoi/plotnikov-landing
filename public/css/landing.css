@@ -6,28 +6,28 @@
 :root,
 [data-theme="warm"] {
     --radius: 0.75rem;
-    --background: #f5f0e8;
-    --foreground: #2d2a26;
-    --card: #fffdf8;
-    --card-foreground: #2d2a26;
-    --muted: #ede6db;
-    --muted-foreground: #78716c;
-    --secondary: #e8e0d4;
-    --secondary-foreground: #44403c;
+    --background: #f2ece0;
+    --foreground: #1c1a17;
+    --card: #fffef9;
+    --card-foreground: #1c1a17;
+    --muted: #e8dfd2;
+    --muted-foreground: #4a4540;
+    --secondary: #ddd4c5;
+    --secondary-foreground: #38342f;
     --accent: #fbbf24;
-    --accent-foreground: #2d2a26;
-    --border: #d6cfc3;
-    --input: #f0e9df;
-    --ring: #d97706;
+    --accent-foreground: #1c1a17;
+    --border: #c8bfb0;
+    --input: #ede5da;
+    --ring: #c2700f;
 
-    --theme-gradient-from: #f59e0b;
+    --theme-gradient-from: #d97706;
     --theme-gradient-via: #ea580c;
     --theme-gradient-to: #f97316;
-    --theme-accent-light: #fef3c7;
-    --theme-accent-medium: #fbbf24;
-    --theme-surface: #faf7f2;
-    --theme-surface-hover: #f5efe5;
-    --theme-glow: rgba(245, 158, 11, 0.4);
+    --theme-accent-light: #fde68a;
+    --theme-accent-medium: #f59e0b;
+    --theme-surface: #f7f2e9;
+    --theme-surface-hover: #f0e8d8;
+    --theme-glow: rgba(217, 119, 6, 0.45);
 }
 
 [data-theme="dark"] {
@@ -83,12 +83,29 @@ button { font-family: inherit; }
     -webkit-text-fill-color: transparent;
     color: transparent;
 }
+/* Стандарт: янтарный градиент текста */
 .theme-gradient-text-amber {
     background: linear-gradient(90deg, #f59e0b, #f97316);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
+}
+/* В тёплой (светлой) теме янтарный текст затемняем для контраста */
+[data-theme="warm"] .theme-gradient-text-amber {
+    background: linear-gradient(90deg, #b45309, #dc4e0a);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+/* Бейдж-метки секций (uppercase tracking-widest, color: var(--theme-gradient-from)) */
+[data-theme="warm"] .uppercase.tracking-widest {
+    --theme-gradient-from: #b45309;
+}
+/* Явный override для hero-badge-label */
+[data-theme="warm"] .hero-text__head > p[style] {
+    --theme-gradient-from: #b45309;
 }
 .theme-surface { background-color: var(--theme-surface); }
 .theme-surface-hover:hover { background-color: var(--theme-surface-hover); }
@@ -245,6 +262,12 @@ button { font-family: inherit; }
     -webkit-backdrop-filter: blur(10px);
     transition: transform .35s ease, box-shadow .35s ease;
 }
+/* Светлая тема: карточки заметнее */
+[data-theme="warm"] .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 12px -4px rgba(0, 0, 0, .10), 0 1px 3px rgba(0, 0, 0, .07);
+}
 .card-strong {
     background: color-mix(in srgb, var(--card) 92%, transparent);
 }
@@ -310,14 +333,20 @@ button { font-family: inherit; }
     padding-bottom: clamp(2.5rem, 8svh, 5rem);
 }
 
+/* Плавающая CTA на фото — только мобайл (см. блок max-width:767 ниже) */
+.hero-cta-primary-float {
+    display: none;
+}
+
 @media (max-width: 767px) {
-    /* Секция = полный экран */
+    /* Секция = полный экран; вертикально не режем текст (overflow-y), горизонталь без скролла */
     .hero-section {
         height: 100svh;
         min-height: 520px;
         padding: 0;
         display: flex;
         flex-direction: column;
+        overflow-x: hidden;
     }
 
     /* Внутренний контейнер: без боковых паддингов, без max-width ограничений */
@@ -328,16 +357,45 @@ button { font-family: inherit; }
         max-width: 100% !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: visible;
     }
 
     /* Сетка: flex-колонка, фото сверху через order */
     .hero-grid {
+        position: relative;
         flex: 1;
         display: flex !important;
         flex-direction: column !important;
         align-items: stretch !important;
         gap: 0 !important;
+    }
+
+    /* Кнопки внизу скрыты — главная CTA только .hero-cta-primary-float на фото */
+    .hero-cta-row {
+        display: none !important;
+    }
+
+    /* Главная CTA: правый верх фото (ниже sticky-шапки h-16 = 4rem) */
+    .hero-cta-primary-float {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 0.35rem;
+        position: absolute;
+        top: calc(4rem + 0.5rem);
+        right: max(0.65rem, env(safe-area-inset-right, 0px));
+        z-index: 4;
+        max-width: min(100% - 1.25rem, 16rem);
+        padding: 0.45rem 0.75rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        line-height: 1.2;
+        border-radius: 9999px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+    .hero-cta-primary-float span {
+        text-align: left;
+        white-space: normal;
     }
 
     /* Фото: абсолютно занимает весь экран сзади */
@@ -376,33 +434,58 @@ button { font-family: inherit; }
         );
     }
 
-    /* Текст: поверх фото, внизу экрана */
+    /* Текст: поверх фото, внизу экрана; margin-bottom + translate (ниже) чуть поднимают карточку, больше заезд на фото */
     .hero-text {
         position: relative;
         z-index: 2;
         margin-top: auto;
+        margin-bottom: max(1.15rem, calc(0.45rem + env(safe-area-inset-bottom, 0px)));
         text-align: left !important;
-        padding: 1.5rem 1.25rem 2rem;
-        gap: 0.85rem !important;
+        padding: 0.95rem 1.05rem 1.05rem;
+        gap: 0.55rem !important;
     }
 
-    /* Описание: сокращаем, чтобы влезло */
+    /* Обе темы: матовая подложка за текстом на мобайле */
+    .hero-text {
+        background: rgba(20, 23, 28, 0.78);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border-radius: 1rem 1rem 0 0;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+    }
+
+    /* Тёплая тема: светлая подложка */
+    [data-theme="warm"] .hero-text {
+        background: rgba(245, 240, 232, 0.88);
+    }
+
+    /* В тёмной теме текст светлый — явно задаём */
+    [data-theme="dark"] .hero-text,
+    .hero-text {
+        color: #ececec;
+    }
+    [data-theme="warm"] .hero-text {
+        color: #2d2a26;
+    }
+    /* Заголовок + бейдж: плотнее, чтобы описание целиком влезало в первый экран */
+    .hero-text__head {
+        gap: 0.35rem !important;
+    }
+    .hero-h1 {
+        font-size: clamp(1.45rem, 5.2vw + 0.45rem, 1.95rem) !important;
+        line-height: 1.1 !important;
+    }
+    /* Описание: полный текст, без line-clamp; чуть меньше кегль и межстрочный */
     .hero-desc {
-        font-size: 0.875rem !important;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        font-size: 0.8125rem !important;
+        line-height: 1.45 !important;
+        margin-top: 0.15rem;
+        display: block;
+        overflow: visible;
+        -webkit-line-clamp: unset;
+        -webkit-box-orient: unset;
     }
-
-    /* CTA-кнопки: горизонтально в ряд */
-    .hero-cta-row {
-        flex-direction: row !important;
-        flex-wrap: wrap;
-        justify-content: flex-start !important;
-        gap: 0.6rem !important;
-    }
-    .hero-cta-row .btn { font-size: 0.85rem; padding: .6rem 1.1rem; }
 
     /* Статистика: скрываем чтобы не было тесно */
     .hero-stats { display: none !important; }
@@ -599,11 +682,13 @@ button { font-family: inherit; }
     padding-bottom: clamp(1rem, 3svh, 2rem);
 }
 @media (max-width: 767px) {
+    /* min-height вместо height: не режем слайдер снизу на низких экранах / с адресной строкой */
     .about-section {
-        height: 100svh;
-        min-height: 520px;
+        min-height: 100svh;
+        min-height: 100dvh;
+        height: auto;
         padding-top:    clamp(1rem, 3svh, 1.5rem);
-        padding-bottom: 0;
+        padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
     }
 }
 @media (min-width: 768px) {
@@ -689,6 +774,48 @@ button { font-family: inherit; }
     overflow: hidden;
     background: var(--muted);
 }
+
+/*
+ * Счётчик поверх фото: вложен в .about-slide (не в .about-slide-photo-col),
+ * иначе на мобилке весь photo-col под текстовой карточкой (z-index) и счётчик прячется.
+ * Desktop: right привязан к границе колонок 2fr|3fr (40% фото слева).
+ */
+.about-slide-counter--overlay {
+    position: absolute;
+    top: 0.75rem;
+    z-index: 10;
+    display: flex;
+    align-items: baseline;
+    gap: 0.15rem;
+    line-height: 1;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-radius: 2rem;
+    padding: 0.25rem 0.7rem;
+    pointer-events: none;
+}
+.about-slide-counter--overlay .about-slide-num {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}
+.about-slide-counter--overlay .about-slide-total {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.75);
+    font-variant-numeric: tabular-nums;
+}
+@media (max-width: 767px) {
+    .about-slide-counter--overlay {
+        right: 0.85rem;
+    }
+}
+@media (min-width: 768px) {
+    .about-slide-counter--overlay {
+        right: calc(60% + 0.75rem);
+    }
+}
 .about-slide-img {
     width: 100%;
     height: 260px;
@@ -713,19 +840,24 @@ button { font-family: inherit; }
     overflow-y: auto;
 }
 
-/* ── Мобайл: фото как полноэкранный фон, текст поверх ── */
+/* ── Мобайл: фото — полный фон, снизу сплошная карточка с текстом ── */
 @media (max-width: 767px) {
-    /* Слайдер без рамки/скруглений — край в край */
+    /* Слайдер: убираем боковые и нижнюю рамки; без жёсткого min-height — иначе клип с 100svh */
     .about-slider {
         border-radius: 0;
         border-left: none;
         border-right: none;
         border-bottom: none;
+        min-height: min(72svh, 520px);
+        flex: 1 1 auto;
     }
 
-    /* Грид слайда → позиционирование */
+    /* Слайд-inner → относительное позиционирование */
     .about-slide-inner {
         position: relative;
+        display: block !important;
+        height: 100%;
+        min-height: 280px;
     }
 
     /* Фото: абсолютно заполняет весь слайд */
@@ -740,67 +872,69 @@ button { font-family: inherit; }
         object-fit: cover;
         object-position: center top;
     }
+    /* Градиент не нужен — карточка сплошная */
+    .about-slide-photo-col::after { display: none; }
 
-    /* Градиент: прозрачный вверху → тёмный внизу → читаемый текст */
-    .about-slide-photo-col::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        z-index: 1;
-        background: linear-gradient(
-            to bottom,
-            rgba(0,0,0,0)    0%,
-            rgba(0,0,0,0.05) 25%,
-            rgba(0,0,0,0.55) 55%,
-            rgba(0,0,0,0.85) 80%,
-            rgba(0,0,0,0.95) 100%
-        );
-    }
-
-    /* Текстовая колонка: абсолютно внизу, поверх градиента */
+    /* Текстовая карточка: больше высоты + скролл только у текста (flex + min-height:0) */
     .about-slide-text-col {
         position: absolute;
         bottom: 0;
         left: 0;
         right: 0;
         z-index: 2;
-        background: transparent;
-        max-height: 60%;
-        overflow-y: auto;
-        padding: 1.25rem 1.25rem 1.5rem;
-        gap: 0.6rem;
-        justify-content: flex-end;
+        max-height: min(62dvh, 68%);
+        overflow: hidden;
+        padding: 1rem 1.15rem 1.1rem;
+        gap: 0.5rem;
+        justify-content: flex-start;
+        background: var(--card);
+        border-radius: 1.25rem 1.25rem 0 0;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        box-shadow: 0 -4px 24px rgba(0,0,0,0.18);
     }
 
-    /* Все тексты — белые */
-    .about-slide-title { color: #fff; }
-    .about-slide-body  { color: rgba(255,255,255,.82); font-size: 0.9rem; }
-    .about-slide-num   { color: var(--theme-gradient-from); }
-    .about-slide-total { color: rgba(255,255,255,.55); }
+    /* Тексты — цвета из темы */
+    .about-slide-title {
+        color: var(--foreground);
+        flex-shrink: 0;
+        font-size: clamp(1.15rem, 4.2vw + 0.35rem, 1.5rem);
+    }
+    .about-slide-body {
+        color: var(--muted-foreground);
+        font-size: 0.875rem;
+        line-height: 1.55;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
 
-    /* Иконка: чуть меньше */
-    .about-slide-icon  { width: 2.25rem; height: 2.25rem; }
+    /* Иконку скрываем — экономим место на маленьком экране */
+    .about-slide-icon { display: none !important; }
 
-    /* Навигация: тёмный полупрозрачный фон */
+    /* Навигационная панель */
     .about-slider-nav {
-        background: rgba(0,0,0,.6);
-        backdrop-filter: blur(8px);
-        border-top: 1px solid rgba(255,255,255,.1);
+        background: var(--card);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        border-top: 1px solid var(--border);
+        padding: 0.65rem 1rem;
     }
     .about-nav-btn {
-        border-color: rgba(255,255,255,.25);
-        color: #fff;
-        background: rgba(255,255,255,.08);
+        border-color: var(--border);
+        color: var(--foreground);
+        background: transparent;
     }
     .about-nav-btn:hover {
         background: var(--theme-gradient-from);
         border-color: var(--theme-gradient-from);
+        color: #fff;
     }
-    .about-dot { background: rgba(255,255,255,.35); }
+    .about-dot { background: var(--muted); }
     .about-dot.active { background: var(--theme-gradient-from); }
-
-    /* Прогресс-бар: тёмный фон */
-    .about-progress-track { background: rgba(255,255,255,.15); }
+    .about-progress-track { background: var(--muted); }
 }
 
 /* Иконка */
@@ -815,25 +949,6 @@ button { font-family: inherit; }
     color: #fff;
     flex-shrink: 0;
     align-self: flex-start;
-}
-
-/* Счётчик */
-.about-slide-counter {
-    display: flex;
-    align-items: baseline;
-    gap: 0.2rem;
-    line-height: 1;
-}
-.about-slide-num {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: var(--theme-gradient-from);
-    font-variant-numeric: tabular-nums;
-}
-.about-slide-total {
-    font-size: 0.9rem;
-    color: var(--muted-foreground);
-    font-variant-numeric: tabular-nums;
 }
 
 /* Заголовок — крупнее */
@@ -924,28 +1039,28 @@ button { font-family: inherit; }
 /* ===== Hero — фон ===== */
 .hero-bg {
     position: absolute; inset: 0;
-    background: linear-gradient(135deg, #fef3c7 0%, color-mix(in srgb, #ffedd5 60%, transparent) 50%, #fafaf9 100%);
+    background: linear-gradient(135deg, #fde68a 0%, #fcd09a 40%, #f5ece0 100%);
 }
 [data-theme="dark"] .hero-bg {
     background: linear-gradient(135deg, #16181d 0%, #181b20 50%, #1f2229 100%);
 }
 .about-bg {
     position: absolute; inset: 0;
-    background: linear-gradient(135deg, color-mix(in srgb, #fde68a 60%, transparent), color-mix(in srgb, #ffedd5 40%, transparent), color-mix(in srgb, #f5f0e8 50%, transparent));
+    background: linear-gradient(135deg, #fcd89a, #fde5b8, #f2ece0);
 }
 [data-theme="dark"] .about-bg {
     background: linear-gradient(135deg, #1c1f25, #1a1d23, #15181d);
 }
 .services-bg {
     position: absolute; inset: 0;
-    background: linear-gradient(135deg, #fafaf9, color-mix(in srgb, #fef3c7 30%, transparent), color-mix(in srgb, #ffedd5 20%, transparent));
+    background: linear-gradient(135deg, #f4ede2, #f8f0e4, #fde9c4 80%);
 }
 [data-theme="dark"] .services-bg {
     background: linear-gradient(135deg, #14171c, #16181d, #1b1d22);
 }
 .contacts-bg {
     position: absolute; inset: 0;
-    background: linear-gradient(135deg, color-mix(in srgb, #fde68a 50%, transparent), color-mix(in srgb, #ffedd5 30%, transparent), color-mix(in srgb, #ccfbf1 20%, transparent));
+    background: linear-gradient(135deg, #fcd89a, #fde5b8, #d4f5ef 95%);
 }
 [data-theme="dark"] .contacts-bg {
     background: linear-gradient(135deg, #1c1f25, #1a1d23, #14171c);
@@ -1025,11 +1140,33 @@ button { font-family: inherit; }
     position: absolute; inset: 0;
     overflow: hidden;
     pointer-events: none;
+    /* Поверх section-*-bg; основной контент секции — в обёртке с z-index: 2 */
     z-index: 1;
 }
+
+/*
+ * Контент выше .floating-layer (z-index:1), иначе слова/иконки рисуются поверх текста карточек.
+ */
+.hero-section > .hero-container {
+    position: relative;
+    z-index: 2;
+}
+#about .about-inner {
+    position: relative;
+    z-index: 2;
+}
+#services > div.relative {
+    position: relative;
+    z-index: 2;
+}
+#contacts > div.relative {
+    position: relative;
+    z-index: 2;
+}
+
 .floating-phrase {
     position: absolute;
-    color: rgba(120, 53, 15, .55);
+    color: rgba(120, 53, 15, .78);
     font-style: italic;
     font-weight: 500;
     user-select: none;
@@ -1037,15 +1174,15 @@ button { font-family: inherit; }
     will-change: transform, opacity;
     animation: floatPhrase 6s ease-in-out infinite;
 }
-[data-theme="dark"] .floating-phrase { color: rgba(254, 240, 138, .42); }
+[data-theme="dark"] .floating-phrase { color: rgba(254, 240, 138, .62); }
 .floating-icon {
     position: absolute;
-    opacity: .55;
+    opacity: .72;
     will-change: transform, opacity;
     animation: floatIcon 7s ease-in-out infinite;
     line-height: 0;
 }
-[data-theme="dark"] .floating-icon { opacity: .45; }
+[data-theme="dark"] .floating-icon { opacity: .6; }
 
 .fi-rose { color: #f43f5e; }
 .fi-amber { color: #d97706; }
@@ -1065,12 +1202,12 @@ button { font-family: inherit; }
 .fi-pink { color: #ec4899; }
 
 @keyframes floatPhrase {
-    0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); opacity: .5; }
-    50% { transform: translateY(-10px) rotate(var(--r, 0deg)); opacity: .75; }
+    0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); opacity: .68; }
+    50% { transform: translateY(-10px) rotate(var(--r, 0deg)); opacity: .92; }
 }
 @keyframes floatIcon {
-    0%, 100% { transform: translateY(0) scale(1) rotate(0deg); opacity: .5; }
-    50% { transform: translateY(-8px) scale(1.1) rotate(5deg); opacity: .75; }
+    0%, 100% { transform: translateY(0) scale(1) rotate(0deg); opacity: .65; }
+    50% { transform: translateY(-8px) scale(1.1) rotate(5deg); opacity: .9; }
 }
 
 /* Лёгкие световые «облака» в floating-layer */
@@ -1102,6 +1239,13 @@ button { font-family: inherit; }
 [data-reveal].is-revealed {
     opacity: 1 !important;
     transform: translate(0, 0) scale(1) !important;
+}
+
+/* Мобайл hero: карточка текста чуть выше, сильнее наезжает на фото — весь блок в первом кадре */
+@media (max-width: 767px) {
+    #top .hero-text[data-reveal] {
+        transform: translateY(-1.1rem) !important;
+    }
 }
 
 /* Stagger через CSS-переменную, ставим из JS */

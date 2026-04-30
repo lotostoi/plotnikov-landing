@@ -59,6 +59,8 @@ class SeoPage extends BaseSettingsPage
                         ->disk('public')
                         ->directory('seo')
                         ->maxSize(4096)
+                        ->imageEditor()
+                        ->imageEditorAspectRatios(['16:9', null])
                         ->columnSpanFull()
                         ->helperText('Используется в og:image и twitter:image. Если пусто — берётся hero-фото.'),
                     TextInput::make('og_image_url')
@@ -71,12 +73,16 @@ class SeoPage extends BaseSettingsPage
                         ->image()
                         ->disk('public')
                         ->directory('seo')
+                        ->imageEditor()
+                        ->imageEditorAspectRatios(['1:1', null])
                         ->acceptedFileTypes(['image/png', 'image/x-icon', 'image/svg+xml', 'image/vnd.microsoft.icon']),
                     FileUpload::make('apple_touch_icon_path')
                         ->label('Apple touch icon (180×180)')
                         ->image()
                         ->disk('public')
                         ->directory('seo')
+                        ->imageEditor()
+                        ->imageEditorAspectRatios(['1:1', null])
                         ->acceptedFileTypes(['image/png']),
                 ]),
 

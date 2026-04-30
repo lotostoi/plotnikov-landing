@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Sections;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -21,6 +22,21 @@ class ContactsSectionPage extends BaseSectionPage
     protected function getFormComponents(): array
     {
         return [
+            Section::make('Фотография секции')
+                ->description('Портретное фото справа. Если не загружено — используется фото по умолчанию.')
+                ->schema([
+                    FileUpload::make('heading.button_url')
+                        ->label('Фото (портрет)')
+                        ->image()
+                        ->disk('public')
+                        ->directory('contacts')
+                        ->imagePreviewHeight('200')
+                        ->imageEditor()
+                        ->imageEditorAspectRatios(['3:4', '2:3', null])
+                        ->downloadable()
+                        ->helperText('Рекомендуется портретная ориентация (3:4).'),
+                ]),
+
             Section::make('Заголовок секции')
                 ->columns(2)
                 ->schema([

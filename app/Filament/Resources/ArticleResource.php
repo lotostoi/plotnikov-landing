@@ -81,6 +81,8 @@ class ArticleResource extends Resource
                         ->disk('public')
                         ->directory('articles')
                         ->imagePreviewHeight('200')
+                        ->imageEditor()
+                        ->imageEditorAspectRatios(['16:9', null])
                         ->helperText('Рекомендуемый размер: 1200×630 px'),
                 ]),
 

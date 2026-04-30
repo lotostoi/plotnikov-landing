@@ -16,7 +16,10 @@
         @if (!empty($pricingConsults))
         <div class="grid gap-6 sm:grid-cols-2 mb-8" data-reveal>
             @foreach ($pricingConsults as $consult)
-            <article class="pricing-card">
+            <article @class([
+                'pricing-card',
+                'md:col-span-2' => ($consult['desktop_span'] ?? 'half') === 'full',
+            ])>
                 <div class="pricing-card__header">
                     <div class="pricing-card__icon">
                         <i data-lucide="{{ $consult['icon'] }}" style="width:24px;height:24px"></i>
@@ -25,7 +28,7 @@
                         <h3 class="pricing-card__title">{{ $consult['title'] }}</h3>
                         @if ($consult['subtitle'])
                             <p class="pricing-card__subtitle">
-                                <i data-lucide="{{ $consult['key'] === 'offline' ? 'map-pin' : 'globe' }}" style="width:13px;height:13px"></i>
+                                <i data-lucide="{{ $consult['subtitle_icon'] ?? 'globe' }}" style="width:13px;height:13px"></i>
                                 {{ $consult['subtitle'] }}
                             </p>
                         @endif

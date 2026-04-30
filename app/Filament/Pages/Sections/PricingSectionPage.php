@@ -6,6 +6,7 @@ namespace App\Filament\Pages\Sections;
 
 use App\Models\LandingBlock;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -32,42 +33,59 @@ class PricingSectionPage extends Page
     {
         $blocks = LandingBlock::where('section_code', 'pricing')
             ->orderBy('sort_order')
+            ->orderBy('id')
             ->get()
             ->keyBy('block_key');
 
-        $formData = [];
+        $heading = $blocks->get('heading');
 
-        // Заголовок и консультации — стандартные блоки
-        foreach (['heading', 'online', 'offline'] as $key) {
-            $block = $blocks->get($key);
-            $formData[$key] = [
-                'badge'       => $block?->badge,
-                'label'       => $block?->label,
-                'title'       => $block?->title,
-                'subtitle'    => $block?->subtitle,
-                'body'        => $block?->body,
-                'button_text' => $block?->button_text,
-                'button_url'  => $block?->button_url,
-                'is_visible'  => $block?->is_visible ?? true,
-            ];
-        }
+        $consults = LandingBlock::where('section_code', 'pricing')
+            ->where('block_type', 'consult')
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->map(function (LandingBlock $b): array {
+                $meta = $b->meta ?? [];
 
-        // Акции — Repeater
+                return [
+                    'title'          => $b->title,
+                    'subtitle'       => $b->subtitle,
+                    'badge'          => $b->badge,
+                    'label'          => $b->label,
+                    'body'           => $b->body,
+                    'button_text'    => $b->button_text,
+                    'button_url'     => $b->button_url,
+                    'is_visible'     => $b->is_visible ?? true,
+                    'desktop_span'   => $meta['desktop_span'] ?? 'half',
+                    'subtitle_icon'  => $meta['subtitle_icon'] ?? ($b->block_key === 'offline' ? 'map-pin' : 'globe'),
+                ];
+            })
+            ->values()
+            ->all();
+
         $promos = LandingBlock::where('section_code', 'pricing')
             ->where('block_type', 'promo')
             ->orderBy('sort_order')
+            ->orderBy('id')
             ->get();
 
-        $formData['promos'] = $promos->map(fn (LandingBlock $b): array => [
-            'badge'       => $b->badge,
-            'title'       => $b->title,
-            'subtitle'    => $b->subtitle,
-            'body'        => $b->body,
-            'button_text' => $b->button_text,
-            'is_visible'  => $b->is_visible,
-        ])->values()->all();
-
-        $this->form->fill($formData);
+        $this->form->fill([
+            'heading' => [
+                'badge'       => $heading?->badge,
+                'title'       => $heading?->title,
+                'subtitle'    => $heading?->subtitle,
+                'is_visible'  => $heading?->is_visible ?? true,
+            ],
+            'consults' => $consults,
+            'promos'   => $promos->map(fn (LandingBlock $b): array => [
+                'badge'       => $b->badge,
+                'title'       => $b->title,
+                'subtitle'    => $b->subtitle,
+                'body'        => $b->body,
+                'button_text' => $b->button_text,
+                'is_visible'  => $b->is_visible,
+            ])->values()->all(),
+        ]);
     }
 
     public function form(Schema $schema): Schema
@@ -84,34 +102,78 @@ class PricingSectionPage extends Page
                         Toggle::make('heading.is_visible')->label('Показывать секцию')->default(true)->columnSpanFull(),
                     ]),
 
-                Section::make('Онлайн-консультация')
-                    ->columns(2)
+                Section::make('Карточки консультаций')
+                    ->description('Перетащите строки за ручку слева, чтобы изменить порядок. Пустые карточки при сохранении не создаются. Удаление — кнопка корзины у строки.')
                     ->schema([
-                        TextInput::make('online.title')->label('Название')->placeholder('Онлайн-консультация')->maxLength(255),
-                        TextInput::make('online.subtitle')->label('Подзаголовок (где/как)')->placeholder('Из любой точки мира')->maxLength(255),
-                        TextInput::make('online.badge')->label('Цена (отображается)')->placeholder('3 500 руб.')->maxLength(100),
-                        TextInput::make('online.label')->label('Иконка (Lucide)')->placeholder('video')->maxLength(100),
-                        Textarea::make('online.body')
-                            ->label('Описание (каждый пункт — с новой строки)')
-                            ->rows(4)->columnSpanFull(),
-                        TextInput::make('online.button_text')->label('Текст кнопки')->placeholder('Записаться')->maxLength(100),
-                        TextInput::make('online.button_url')->label('Ссылка кнопки')->placeholder('#contacts')->maxLength(500),
-                        Toggle::make('online.is_visible')->label('Показывать')->default(true)->columnSpanFull(),
-                    ]),
+                        Repeater::make('consults')
+                            ->label('')
+                            ->schema([
+                                TextInput::make('title')
+                                    ->label('Название')
+                                    ->placeholder('Онлайн-консультация')
+                                    ->maxLength(255)
+                                    ->columnSpanFull(),
 
-                Section::make('Очная консультация')
-                    ->columns(2)
-                    ->schema([
-                        TextInput::make('offline.title')->label('Название')->placeholder('Очная консультация')->maxLength(255),
-                        TextInput::make('offline.subtitle')->label('Город')->placeholder('Владивосток, Артём')->maxLength(255),
-                        TextInput::make('offline.badge')->label('Цена (отображается)')->placeholder('3 500 руб.')->maxLength(100),
-                        TextInput::make('offline.label')->label('Иконка (Lucide)')->placeholder('map-pin')->maxLength(100),
-                        Textarea::make('offline.body')
-                            ->label('Описание (каждый пункт — с новой строки)')
-                            ->rows(4)->columnSpanFull(),
-                        TextInput::make('offline.button_text')->label('Текст кнопки')->placeholder('Записаться')->maxLength(100),
-                        TextInput::make('offline.button_url')->label('Ссылка кнопки')->placeholder('#contacts')->maxLength(500),
-                        Toggle::make('offline.is_visible')->label('Показывать')->default(true)->columnSpanFull(),
+                                TextInput::make('subtitle')
+                                    ->label('Подзаголовок (где / как)')
+                                    ->placeholder('Из любой точки мира')
+                                    ->maxLength(255),
+
+                                TextInput::make('badge')
+                                    ->label('Цена (как на карточке)')
+                                    ->placeholder('3 500 руб.')
+                                    ->maxLength(100),
+
+                                TextInput::make('label')
+                                    ->label('Иконка карточки (Lucide)')
+                                    ->placeholder('video')
+                                    ->maxLength(100),
+
+                                Select::make('subtitle_icon')
+                                    ->label('Иконка у подзаголовка')
+                                    ->options([
+                                        'globe'   => 'Глобус (онлайн)',
+                                        'map-pin' => 'Метка (адрес / город)',
+                                    ])
+                                    ->default('globe'),
+
+                                Select::make('desktop_span')
+                                    ->label('Ширина на десктопе (от md)')
+                                    ->options([
+                                        'half' => 'Половина ряда — две карточки в ряд',
+                                        'full' => 'На всю ширину сетки (одна карточка в ряд)',
+                                    ])
+                                    ->default('half')
+                                    ->columnSpanFull(),
+
+                                Textarea::make('body')
+                                    ->label('Описание (каждый пункт — с новой строки)')
+                                    ->rows(4)
+                                    ->columnSpanFull(),
+
+                                TextInput::make('button_text')
+                                    ->label('Текст кнопки')
+                                    ->placeholder('Записаться')
+                                    ->maxLength(100),
+
+                                TextInput::make('button_url')
+                                    ->label('Ссылка кнопки')
+                                    ->placeholder('#contacts')
+                                    ->maxLength(500),
+
+                                Toggle::make('is_visible')
+                                    ->label('Показывать')
+                                    ->default(true)
+                                    ->columnSpanFull(),
+                            ])
+                            ->columns(2)
+                            ->reorderable()
+                            ->deletable()
+                            ->addActionLabel('Добавить консультацию')
+                            ->collapsible()
+                            ->collapsed()
+                            ->itemLabel(fn (array $state): ?string => $state['title'] ?: 'Новая консультация')
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make('Акции и специальные предложения')
@@ -164,47 +226,69 @@ class PricingSectionPage extends Page
     {
         $state = $this->form->getState();
 
-        // Стандартные блоки (heading, online, offline)
-        $rows = [];
-        $typeMap = ['heading' => 'text', 'online' => 'consult', 'offline' => 'consult'];
-
-        foreach (['heading', 'online', 'offline'] as $key) {
-            $d = $state[$key] ?? [];
-            $rows[] = [
+        $heading = $state['heading'] ?? [];
+        LandingBlock::updateOrCreate(
+            [
                 'section_code' => 'pricing',
-                'block_key'    => $key,
-                'block_type'   => $typeMap[$key],
-                'badge'        => $d['badge'] ?? null,
-                'label'        => $d['label'] ?? null,
-                'title'        => $d['title'] ?? null,
-                'subtitle'     => $d['subtitle'] ?? null,
-                'body'         => $d['body'] ?? null,
-                'button_text'  => $d['button_text'] ?? null,
-                'button_url'   => $d['button_url'] ?? null,
-                'is_visible'   => (bool) ($d['is_visible'] ?? true),
-                'sort_order'   => match ($key) { 'heading' => 10, 'online' => 20, 'offline' => 30 },
-                'meta'         => null,
-            ];
-        }
-
-        LandingBlock::upsert(
-            $rows,
-            ['section_code', 'block_key'],
-            ['block_type', 'badge', 'label', 'title', 'subtitle', 'body', 'button_text', 'button_url', 'is_visible'],
+                'block_key'    => 'heading',
+            ],
+            [
+                'block_type'  => 'text',
+                'badge'       => $heading['badge'] ?? null,
+                'title'       => $heading['title'] ?? null,
+                'subtitle'    => $heading['subtitle'] ?? null,
+                'is_visible'  => (bool) ($heading['is_visible'] ?? true),
+                'label'       => null,
+                'body'        => null,
+                'button_text' => null,
+                'button_url'  => null,
+                'meta'        => null,
+            ],
         );
 
-        // Акции — удаляем старые, вставляем новые
+        LandingBlock::where('section_code', 'pricing')
+            ->where('block_type', 'consult')
+            ->delete();
+
+        $consultIdx = 0;
+        foreach ($state['consults'] ?? [] as $row) {
+            if (empty(trim((string) ($row['title'] ?? '')))) {
+                continue;
+            }
+            $consultIdx++;
+            LandingBlock::create([
+                'section_code' => 'pricing',
+                'block_key'    => 'consult_' . $consultIdx,
+                'block_type'   => 'consult',
+                'label'        => $row['label'] ?? 'video',
+                'badge'        => $row['badge'] ?? null,
+                'title'        => $row['title'] ?? null,
+                'subtitle'     => $row['subtitle'] ?? null,
+                'body'         => $row['body'] ?? null,
+                'button_text'  => $row['button_text'] ?? null,
+                'button_url'   => $row['button_url'] ?? null,
+                'is_visible'   => (bool) ($row['is_visible'] ?? true),
+                'sort_order'   => $consultIdx * 10,
+                'meta'         => [
+                    'desktop_span'  => $row['desktop_span'] ?? 'half',
+                    'subtitle_icon' => $row['subtitle_icon'] ?? 'globe',
+                ],
+            ]);
+        }
+
         LandingBlock::where('section_code', 'pricing')
             ->where('block_type', 'promo')
             ->delete();
 
-        foreach ($state['promos'] ?? [] as $i => $promo) {
+        $promoIdx = 0;
+        foreach ($state['promos'] ?? [] as $promo) {
             if (empty($promo['title'])) {
                 continue;
             }
+            $promoIdx++;
             LandingBlock::create([
                 'section_code' => 'pricing',
-                'block_key'    => 'promo_' . ($i + 1),
+                'block_key'    => 'promo_' . $promoIdx,
                 'block_type'   => 'promo',
                 'badge'        => $promo['badge'] ?? 'Акция',
                 'title'        => $promo['title'] ?? null,
@@ -212,7 +296,7 @@ class PricingSectionPage extends Page
                 'body'         => $promo['body'] ?? null,
                 'button_text'  => $promo['button_text'] ?? null,
                 'is_visible'   => (bool) ($promo['is_visible'] ?? true),
-                'sort_order'   => ($i + 1) * 10 + 30,
+                'sort_order'   => $promoIdx * 10 + 100,
             ]);
         }
 

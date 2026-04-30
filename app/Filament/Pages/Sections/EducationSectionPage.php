@@ -88,6 +88,21 @@ class EducationSectionPage extends Page
         return $schema
             ->statePath('data')
             ->components([
+                Section::make('Фотография секции')
+                    ->description('Портретное фото справа. Если не загружено — используется фото по умолчанию.')
+                    ->schema([
+                        FileUpload::make('heading.button_url')
+                            ->label('Фото (портрет)')
+                            ->image()
+                            ->disk('public')
+                            ->directory('education')
+                            ->imagePreviewHeight('200')
+                            ->imageEditor()
+                            ->imageEditorAspectRatios(['3:4', '2:3', null])
+                            ->downloadable()
+                            ->helperText('Рекомендуется портретная ориентация (3:4).'),
+                    ]),
+
                 Section::make('Заголовок секции')
                     ->columns(2)
                     ->schema([
@@ -137,6 +152,8 @@ class EducationSectionPage extends Page
                                             ->disk('public')
                                             ->directory('education/certs')
                                             ->imagePreviewHeight('180')
+                                            ->imageEditor()
+                                            ->imageEditorAspectRatios(['4:3', '3:2', null])
                                             ->downloadable()
                                             ->columnSpanFull(),
                                     ])
