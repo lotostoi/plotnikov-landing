@@ -902,21 +902,23 @@ button { font-family: inherit; }
         padding: 1rem 1.15rem 1.1rem;
         gap: 0.5rem;
         justify-content: flex-start;
-        background: rgba(0, 0, 0, 0.20);
+        background: rgba(0, 0, 0, 0.52);
         border-radius: 1.25rem 1.25rem 0 0;
         backdrop-filter: blur(22px);
         -webkit-backdrop-filter: blur(22px);
         box-shadow: none;
     }
 
-    /* Тексты — белые, читаются на тёмном градиенте */
-    .about-slide-title {
-        color: #fff;
+    /* Тексты — всегда белые поверх тёмной подложки, обе темы */
+    .about-slide-title,
+    [data-theme="warm"] .about-slide-title {
+        color: #fff !important;
         flex-shrink: 0;
         font-size: clamp(1.15rem, 4.2vw + 0.35rem, 1.5rem);
     }
-    .about-slide-body {
-        color: rgba(255, 255, 255, 0.82);
+    .about-slide-body,
+    [data-theme="warm"] .about-slide-body {
+        color: rgba(255, 255, 255, 0.85) !important;
         font-size: 0.875rem;
         line-height: 1.55;
         flex: 1 1 auto;
