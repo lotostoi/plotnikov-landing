@@ -6,14 +6,18 @@ namespace App\Filament\Pages\Sections;
 
 use App\Models\LandingBlock;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\HtmlString;
 
 class AboutSectionPage extends BaseSectionPage
 {
@@ -137,6 +141,7 @@ class AboutSectionPage extends BaseSectionPage
                                 ->label('Заголовок слайда')
                                 ->placeholder('Здравствуйте, я Александр')
                                 ->maxLength(255)
+                                ->live(onBlur: true)
                                 ->columnSpanFull(),
 
                             TextInput::make('label')
@@ -157,7 +162,8 @@ class AboutSectionPage extends BaseSectionPage
                                 ->imagePreviewHeight('160')
                                 ->imageEditor()
                                 ->imageEditorAspectRatios(['16:9', '4:3', null])
-                                ->downloadable(),
+                                ->downloadable()
+                                ->live(),
 
                             FileUpload::make('photo_mobile')
                                 ->label('Фото — Mobile (необязательно)')
@@ -168,7 +174,8 @@ class AboutSectionPage extends BaseSectionPage
                                 ->imageEditor()
                                 ->imageEditorAspectRatios(['9:16', '3:4', null])
                                 ->helperText('Если не загружено — используется Desktop-фото')
-                                ->downloadable(),
+                                ->downloadable()
+                                ->live(),
 
                             Textarea::make('body')
                                 ->label('Текст слайда')
@@ -179,6 +186,63 @@ class AboutSectionPage extends BaseSectionPage
                                     : ''
                                 )
                                 ->rows(6)
+                                ->columnSpanFull(),
+
+                            Placeholder::make('slide_preview')
+                                ->label('Превью на мобайле')
+                                ->live()
+                                ->content(function (Get $get): HtmlString {
+                                    $photo       = $get('button_url');
+                                    $photoMobile = $get('photo_mobile');
+                                    $title       = $get('title') ?: 'Заголовок слайда';
+                                    $body        = $get('body') ?: '';
+
+                                    $bodyPreview = mb_substr(strip_tags($body), 0, 160)
+                                        . (mb_strlen($body) > 160 ? '…' : '');
+
+                                    $imageFile = $photoMobile ?: $photo;
+
+                                    if (is_array($imageFile)) {
+                                        $imageFile = reset($imageFile) ?: null;
+                                    }
+
+                                    if (!$imageFile) {
+                                        return new HtmlString(
+                                            '<div style="width:100%;max-width:360px;height:140px;border-radius:12px;'
+                                            . 'background:#f3f4f6;display:flex;align-items:center;justify-content:center;'
+                                            . 'color:#9ca3af;font-size:.875rem;gap:.5rem;">'
+                                            . '📷 Загрузите фото — появится превью'
+                                            . '</div>'
+                                        );
+                                    }
+
+                                    $url = Storage::disk('public')->url($imageFile);
+
+                                    return new HtmlString(
+                                        '<div style="position:relative;width:100%;max-width:360px;height:460px;'
+                                        . 'border-radius:12px;overflow:hidden;font-family:sans-serif;'
+                                        . 'box-shadow:0 4px 24px rgba(0,0,0,.22);">'
+
+                                        . '<img src="' . e($url) . '" style="position:absolute;inset:0;'
+                                        . 'width:100%;height:100%;object-fit:cover;object-position:center top;">'
+
+                                        . '<div style="position:absolute;inset:0;background:linear-gradient('
+                                        . 'to bottom,transparent 0%,transparent 25%,'
+                                        . 'rgba(0,0,0,.38) 50%,rgba(0,0,0,.74) 72%,rgba(0,0,0,.92) 100%);"></div>'
+
+                                        . '<div style="position:absolute;bottom:0;left:0;right:0;'
+                                        . 'padding:.9rem 1rem 1rem;background:rgba(0,0,0,.20);'
+                                        . 'backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);'
+                                        . 'border-radius:12px 12px 0 0;">'
+                                        . '<div style="color:#fff;font-size:1rem;font-weight:700;'
+                                        . 'line-height:1.2;margin-bottom:.4rem;">' . e($title) . '</div>'
+                                        . '<div style="color:rgba(255,255,255,.82);font-size:.8rem;line-height:1.5;">'
+                                        . e($bodyPreview) . '</div>'
+                                        . '</div>'
+
+                                        . '</div>'
+                                    );
+                                })
                                 ->columnSpanFull(),
                         ])
                         ->columns(2)
