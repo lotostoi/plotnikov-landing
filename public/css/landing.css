@@ -840,118 +840,134 @@ button { font-family: inherit; }
     overflow-y: auto;
 }
 
-/* ── Мобайл: фото — полный фон, снизу сплошная карточка с текстом ── */
+/* ── Мобайл: фото сверху (фикс. высота) + текст снизу, без наложения ── */
 @media (max-width: 767px) {
-    /* Слайдер: убираем боковые и нижнюю рамки; без жёсткого min-height — иначе клип с 100svh */
+    /* Слайдер: карточка, высота по контенту */
     .about-slider {
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-        border-bottom: none;
-        min-height: min(72svh, 520px);
-        flex: 1 1 auto;
+        border-radius: calc(var(--radius) * 1.5);
+        border: 1px solid var(--border);
+        min-height: 0;
+        flex: none;
+        overflow: hidden;
+        box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.12);
     }
 
-    /* Слайд-inner → относительное позиционирование */
-    .about-slide-inner {
+    /* Трек: высота по активному слайду */
+    .about-slides-track {
+        flex: none;
+        min-height: 0;
         position: relative;
-        display: block !important;
-        height: 100%;
-        min-height: 280px;
+        overflow: visible;
     }
 
-    /* Фото: абсолютно заполняет весь слайд */
-    .about-slide-photo-col {
-        position: absolute;
-        inset: 0;
-        z-index: 0;
+    /* Слайды: в потоке, скрыты через display */
+    .about-slide {
+        position: relative;
+        inset: auto;
+        display: none;
+        opacity: 1;
+        pointer-events: none;
+        transition: none;
+        z-index: auto;
     }
+    .about-slide.active {
+        display: block;
+        pointer-events: auto;
+        animation: aboutFadeIn 0.3s ease;
+    }
+    @keyframes aboutFadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    /* Inner: фото сверху, текст снизу */
+    .about-slide-inner {
+        position: static;
+        display: flex !important;
+        flex-direction: column;
+        height: auto;
+        min-height: 0;
+    }
+
+    /* Фото: фиксированная высота, нет абсолютного позиционирования */
+    .about-slide-photo-col {
+        position: static;
+        flex: 0 0 220px;
+        height: 220px;
+        overflow: hidden;
+        z-index: auto;
+    }
+    /* Убираем градиент — он был нужен только для overlay-текста */
+    .about-slide-photo-col::after { display: none; }
+
     .about-slide-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        object-position: center top;
-    }
-    /* Сильный тёмный градиент снизу фото — явная подложка под текст */
-    .about-slide-photo-col::after {
-        content: "";
-        display: block;
-        position: absolute;
-        inset: 0;
-        z-index: 1;
-        pointer-events: none;
-        background: linear-gradient(
-            to bottom,
-            transparent          0%,
-            transparent          25%,
-            rgba(0, 0, 0, 0.38)  50%,
-            rgba(0, 0, 0, 0.74)  72%,
-            rgba(0, 0, 0, 0.92)  100%
-        );
+        object-position: var(--mobile-focal, center 30%);
     }
 
-    /* Текстовая карточка: матовое стекло поверх градиента */
+    /* Текстовая колонка: нормальный поток, цвета темы */
     .about-slide-text-col {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 2;
-        max-height: min(62dvh, 68%);
-        overflow: hidden;
-        padding: 1rem 1.15rem 1.1rem;
-        gap: 0.5rem;
+        position: static;
+        max-height: none;
+        overflow: visible;
+        border-radius: 0;
+        background: var(--card);
+        color: var(--foreground);
+        padding: 1.1rem 1.15rem 1.25rem;
+        gap: 0.6rem;
         justify-content: flex-start;
-        background: rgba(0, 0, 0, 0.52);
-        border-radius: 1.25rem 1.25rem 0 0;
-        backdrop-filter: blur(22px);
-        -webkit-backdrop-filter: blur(22px);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
         box-shadow: none;
+        border-top: 1px solid var(--border);
     }
 
-    /* Тексты — всегда белые поверх тёмной подложки, обе темы */
+    /* Сбрасываем белые цвета overlay — возвращаем тему */
     .about-slide-title,
     [data-theme="warm"] .about-slide-title {
-        color: #fff !important;
+        color: var(--foreground) !important;
+        font-size: clamp(1rem, 4vw, 1.2rem);
         flex-shrink: 0;
-        font-size: clamp(1.15rem, 4.2vw + 0.35rem, 1.5rem);
     }
     .about-slide-body,
     [data-theme="warm"] .about-slide-body {
-        color: rgba(255, 255, 255, 0.85) !important;
+        color: var(--muted-foreground) !important;
         font-size: 0.875rem;
-        line-height: 1.55;
-        flex: 1 1 auto;
+        line-height: 1.6;
+        flex: none;
         min-height: 0;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: auto;
+        overscroll-behavior: auto;
     }
 
-    /* Иконку скрываем — экономим место на маленьком экране */
-    .about-slide-icon { display: none !important; }
+    /* Иконку показываем — есть место */
+    .about-slide-icon { display: inline-flex !important; }
 
-    /* Навигационная панель — тёмная полупрозрачная */
+    /* Навигация: светлая тема */
     .about-slider-nav {
-        background: rgba(0, 0, 0, 0.55);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-top: 1px solid rgba(255, 255, 255, 0.10);
-        padding: 0.65rem 1rem;
+        background: var(--card);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        border-top: 1px solid var(--border);
+        padding: 0.6rem 1rem;
     }
     .about-nav-btn {
-        border-color: rgba(255, 255, 255, 0.25);
-        color: #fff;
-        background: transparent;
+        border-color: var(--border);
+        color: var(--foreground);
+        background: var(--background);
     }
     .about-nav-btn:hover {
         background: var(--theme-gradient-from);
         border-color: var(--theme-gradient-from);
         color: #fff;
     }
-    .about-dot { background: rgba(255, 255, 255, 0.35); }
-    .about-dot.active { background: var(--theme-gradient-from); }
-    .about-progress-track { background: rgba(255, 255, 255, 0.15); }
+    .about-dot { background: var(--muted-foreground); opacity: 0.3; }
+    .about-dot.active { background: var(--theme-gradient-from); opacity: 1; }
+    .about-progress-track { background: var(--border); }
+    .about-progress-bar { background: var(--theme-gradient-from); }
 }
 
 /* Иконка */

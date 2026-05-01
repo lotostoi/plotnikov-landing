@@ -69,6 +69,8 @@ docker compose exec -T app php artisan make:filament-user
 
 После добавления всех секретов — пуш в `main` задеплоит автоматически.
 
+Полная пошаговая инструкция (сервер, deploy key для `git fetch`, секреты): [documentation/deploy/github-actions-autodeploy.md](../../documentation/deploy/github-actions-autodeploy.md).
+
 ### Генерация SSH-ключа (если нет)
 
 На своей машине:

@@ -126,6 +126,8 @@ curl -s -o /dev/null -w "%{http_code}" https://ВАШ_ДОМЕН.ru
 
 Workflow `.github/workflows/deploy.yml` уже настроен — триггерится при пуше в `main`.
 
+**Пошаговая настройка с нуля (сервер + два SSH-ключа + секреты):** [documentation/deploy/github-actions-autodeploy.md](../../documentation/deploy/github-actions-autodeploy.md).
+
 ### Добавить секреты в GitHub
 
 `https://github.com/lotostoi/plotnikov-landing` → **Settings → Secrets and variables → Actions → New repository secret**

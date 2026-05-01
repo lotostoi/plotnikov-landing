@@ -141,11 +141,12 @@ class LandingPageController extends Controller
                     : $photo;
 
                 return [
-                    'icon'         => $block->label ?: 'user',
-                    'title'        => $block->title ?: '',
-                    'body'         => $block->body ?: '',
-                    'photo'        => $photo,
-                    'photo_mobile' => $photoMobile,
+                    'icon'                  => $block->label ?: 'user',
+                    'title'                 => $block->title ?: '',
+                    'body'                  => $block->body ?: '',
+                    'photo'                 => $photo,
+                    'photo_mobile'          => $photoMobile,
+                    'photo_mobile_position' => $block->meta['photo_mobile_position'] ?? 'center top',
                 ];
             })
             ->values()

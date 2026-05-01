@@ -6,6 +6,7 @@ namespace App\Filament\Pages\Sections;
 
 use App\Models\LandingBlock;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
@@ -41,9 +42,10 @@ class AboutSectionPage extends BaseSectionPage
                 'label'        => $block->label,
                 'title'        => $block->title,
                 'body'         => $block->body,
-                'button_url'   => $block->button_url,
-                'photo_mobile' => $block->meta['photo_mobile'] ?? null,
-                'is_visible'   => $block->is_visible,
+                'button_url'            => $block->button_url,
+                'photo_mobile'          => $block->meta['photo_mobile'] ?? null,
+                'photo_mobile_position' => $block->meta['photo_mobile_position'] ?? '50% 20%',
+                'is_visible'            => $block->is_visible,
             ])
             ->toArray();
 
@@ -96,7 +98,10 @@ class AboutSectionPage extends BaseSectionPage
                 'body'         => $slide['body'] ?? null,
                 'button_url'   => $slide['button_url'] ?? null,
                 'is_visible'   => (bool) ($slide['is_visible'] ?? true),
-                'meta'         => ['photo_mobile' => $slide['photo_mobile'] ?? null],
+                'meta'         => [
+                    'photo_mobile'          => $slide['photo_mobile'] ?? null,
+                    'photo_mobile_position' => $slide['photo_mobile_position'] ?? '50% 20%',
+                ],
             ]);
         }
 
@@ -176,6 +181,9 @@ class AboutSectionPage extends BaseSectionPage
                                 ->downloadable()
                                 ->live(),
 
+                            Hidden::make('photo_mobile_position')
+                                ->default('50% 20%'),
+
                             Textarea::make('body')
                                 ->label('Текст слайда')
                                 ->helperText('Абзацы разделяйте пустой строкой (два Enter).')
@@ -188,59 +196,97 @@ class AboutSectionPage extends BaseSectionPage
                                 ->columnSpanFull(),
 
                             Placeholder::make('slide_preview')
-                                ->label('Превью как в слайдере на телефоне')
-                                ->helperText('Те же высота блока, градиент и подложка текста, что на лендинге (мобайл). Сначала mobile-фото, иначе desktop — как <picture> на сайте.')
+                                ->label('Превью на телефоне — кликните на фото чтобы выбрать фокус')
+                                ->helperText('Оранжевая точка — текущий фокус. Нажмите в нужное место фото чтобы сдвинуть кадрирование.')
                                 ->dehydrated(false)
                                 ->live()
-                                ->content(function (Get $get): HtmlString {
+                                ->content(function (Get $get, Placeholder $component): HtmlString {
                                     $photo        = $get('button_url');
-                                    $photoMobile = $get('photo_mobile');
+                                    $photoMobile  = $get('photo_mobile');
                                     $title        = $get('title') ?: 'Заголовок слайда';
                                     $body         = $get('body') ?: '';
+                                    $position     = $get('photo_mobile_position') ?: '50% 20%';
 
-                                    $bodyPreview = mb_substr(strip_tags($body), 0, 160)
-                                        . (mb_strlen($body) > 160 ? '…' : '');
+                                    // Полный текст — чтобы карточка в превью занимала столько же места, сколько на телефоне
+                                    $bodyFull = nl2br(e(strip_tags($body)));
 
                                     $imageRaw = $photoMobile ?: $photo;
                                     $url      = self::resolveSlideImageUrl($imageRaw);
+
+                                    // Вычисляем wire-path для $wire.set() в Alpine
+                                    $statePath   = $component->getStatePath();
+                                    $parentPath  = substr($statePath, 0, (int) strrpos($statePath, '.'));
+                                    $posWirePath = $parentPath . '.photo_mobile_position';
 
                                     if ($url === null) {
                                         return new HtmlString(
                                             '<div style="width:100%;max-width:390px;min-height:140px;border-radius:12px;'
                                             . 'background:#f3f4f6;display:flex;align-items:center;justify-content:center;'
                                             . 'color:#6b7280;font-size:.875rem;padding:1rem;text-align:center;">'
-                                            . 'Загрузите фото (desktop или mobile) — здесь будет то же кадрирование, что в слайдере.'
+                                            . 'Загрузите фото — здесь появится превью с фокус-пикером.'
                                             . '</div>'
                                         );
                                     }
 
-                                    // Совпадает с landing.css: .about-slider (мобайл) + градиент + текстовая карточка
-                                    return new HtmlString(
-                                        '<div style="position:relative;width:100%;max-width:390px;height:min(72svh, 520px);'
-                                        . 'min-height:280px;border-radius:12px;overflow:hidden;font-family:Manrope,system-ui,sans-serif;'
-                                        . 'box-shadow:0 8px 32px rgba(0,0,0,.18);">'
+                                    $safeUrl         = e($url);
+                                    $safeTitle       = e($title);
+                                    $safePosition    = e($position);
+                                    $safePosWirePath = e($posWirePath);
 
-                                        . '<img src="' . e($url) . '" alt="" style="position:absolute;inset:0;'
-                                        . 'width:100%;height:100%;object-fit:cover;object-position:center top;">'
+                                    $html = <<<HTML
+<div
+  x-data="{
+    pos: '',
+    url: '',
+    wirePath: '',
+    updateFocal(e) {
+      var rect = e.currentTarget.getBoundingClientRect();
+      var x = Math.round((e.clientX - rect.left) / rect.width * 100);
+      var y = Math.round((e.clientY - rect.top) / rect.height * 100);
+      this.pos = x + '% ' + y + '%';
+      \$wire.set(this.wirePath, this.pos);
+    },
+    kw(v) {
+      return {'left':'0%','center':'50%','right':'100%','top':'0%','bottom':'100%'}[v] || v;
+    },
+    get dotX() { var p = this.pos.split(' '); return this.kw(p[0] || '50%'); },
+    get dotY() { var p = this.pos.split(' '); return this.kw(p[1] || '30%'); }
+  }"
+  x-init="pos = \$el.dataset.pos; url = \$el.dataset.url; wirePath = \$el.dataset.wirePath"
+  data-pos="{$safePosition}"
+  data-url="{$safeUrl}"
+  data-wire-path="{$safePosWirePath}"
+  style="font-family:Manrope,system-ui,sans-serif;max-width:390px;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px -8px rgba(0,0,0,.15);border:1px solid #e5e7eb;"
+>
+  <!-- Фото: фиксированная высота 220px, кликается для выбора фокуса -->
+  <div
+    style="position:relative;width:100%;height:220px;overflow:hidden;cursor:crosshair;background:#f3f4f6;"
+    @click="updateFocal(\$event)"
+  >
+    <img
+      :src="url"
+      alt=""
+      :style="'width:100%;height:100%;object-fit:cover;object-position:' + pos"
+    >
+    <!-- Счётчик -->
+    <div style="position:absolute;top:0.65rem;right:0.65rem;background:rgba(0,0,0,.45);color:#fff;font-size:0.7rem;font-weight:700;padding:0.2rem 0.65rem;border-radius:2rem;pointer-events:none;backdrop-filter:blur(6px);">01 / 01</div>
+    <!-- Фокус-точка -->
+    <div
+      :style="'position:absolute;width:20px;height:20px;border-radius:50%;background:rgba(251,146,60,.95);border:2.5px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.6);transform:translate(-50%,-50%);pointer-events:none;z-index:10;left:' + dotX + ';top:' + dotY"
+    ></div>
+  </div>
+  <!-- Текст: нормальный поток, без наложения -->
+  <div style="padding:1rem 1.1rem 1.15rem;background:#fff;border-top:1px solid #e5e7eb;">
+    <div style="font-size:1.1rem;font-weight:700;line-height:1.2;margin-bottom:0.4rem;color:#111827;">{$safeTitle}</div>
+    <div style="font-size:0.875rem;line-height:1.6;color:#6b7280;">{$bodyFull}</div>
+  </div>
+  <p style="font-size:0.7rem;color:#9ca3af;margin:0;padding:0.35rem 1.1rem 0.5rem;background:#fff;border-top:1px solid #f3f4f6;">
+    Фокус фото: <span x-text="pos" style="font-weight:600;color:#374151;"></span> — кликните на фото чтобы изменить
+  </p>
+</div>
+HTML;
 
-                                        . '<div style="position:absolute;inset:0;pointer-events:none;'
-                                        . 'background:linear-gradient(to bottom,'
-                                        . 'transparent 0%,transparent 25%,'
-                                        . 'rgba(0,0,0,.38) 50%,rgba(0,0,0,.74) 72%,rgba(0,0,0,.92) 100%);"></div>'
-
-                                        . '<div style="position:absolute;bottom:0;left:0;right:0;'
-                                        . 'padding:1rem 1.15rem 1.1rem;'
-                                        . 'background:rgba(0,0,0,.52);'
-                                        . 'backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);'
-                                        . 'border-radius:1.25rem 1.25rem 0 0;">'
-                                        . '<div style="color:#fff!important;font-size:clamp(1.15rem,4vw,1.35rem);'
-                                        . 'font-weight:700;line-height:1.15;margin-bottom:.35rem;">' . e($title) . '</div>'
-                                        . '<div style="color:rgba(255,255,255,.85)!important;font-size:.875rem;line-height:1.55;">'
-                                        . e($bodyPreview) . '</div>'
-                                        . '</div>'
-
-                                        . '</div>'
-                                    );
+                                    return new HtmlString($html);
                                 })
                                 ->columnSpanFull(),
                         ])

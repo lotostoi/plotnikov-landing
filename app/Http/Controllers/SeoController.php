@@ -2,36 +2,77 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Article;
 use App\Models\LandingPageContent;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Schema;
 
 class SeoController extends Controller
 {
+    /**
+     * @return array{base: string, content: ?LandingPageContent}
+     */
+    private function siteContext(): array
+    {
+        $content = Schema::hasTable('landing_page_contents')
+            ? LandingPageContent::query()->first()
+            : null;
+
+        $raw = $content?->canonical_url ?: config('app.url') ?: url('/');
+        $base = rtrim((string) $raw, '/');
+        if ($base === '') {
+            $base = rtrim((string) url('/'), '/');
+        }
+
+        return ['base' => $base, 'content' => $content];
+    }
+
     public function sitemap(): Response
     {
-        $content = LandingPageContent::query()->first();
-        $base = rtrim($content?->canonical_url ?: config('app.url') ?: url('/'), '/');
-        $lastmod = ($content?->updated_at ?: now())->toAtomString();
+        ['base' => $base, 'content' => $content] = $this->siteContext();
+        $homeLastmod = $content?->updated_at ?? now();
 
-        $sections = [
-            ['loc' => $base . '/',         'priority' => '1.0', 'changefreq' => 'weekly'],
-            ['loc' => $base . '/#about',   'priority' => '0.8', 'changefreq' => 'monthly'],
-            ['loc' => $base . '/#services','priority' => '0.9', 'changefreq' => 'monthly'],
-            ['loc' => $base . '/#education','priority' => '0.7', 'changefreq' => 'yearly'],
-            ['loc' => $base . '/#reviews', 'priority' => '0.7', 'changefreq' => 'monthly'],
-            ['loc' => $base . '/#blog',    'priority' => '0.6', 'changefreq' => 'monthly'],
-            ['loc' => $base . '/#faq',     'priority' => '0.7', 'changefreq' => 'monthly'],
-            ['loc' => $base . '/#contacts','priority' => '0.9', 'changefreq' => 'monthly'],
+        // В <loc> нельзя использовать URL с фрагментом (#) — только реальные пути.
+        $entries = [
+            [
+                'loc' => $base . '/',
+                'lastmod' => $homeLastmod,
+                'changefreq' => 'weekly',
+                'priority' => '1.0',
+            ],
+            [
+                'loc' => $base . '/blog',
+                'lastmod' => $homeLastmod,
+                'changefreq' => 'weekly',
+                'priority' => '0.8',
+            ],
         ];
+
+        if (Schema::hasTable('articles')) {
+            $articles = Article::published()
+                ->orderByDesc('updated_at')
+                ->get(['slug', 'updated_at', 'published_at']);
+
+            foreach ($articles as $article) {
+                $lastmod = $article->updated_at ?? $article->published_at ?? $homeLastmod;
+                $entries[] = [
+                    'loc' => $base . '/blog/' . $article->slug,
+                    'lastmod' => $lastmod,
+                    'changefreq' => 'monthly',
+                    'priority' => '0.7',
+                ];
+            }
+        }
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
-        foreach ($sections as $url) {
+        foreach ($entries as $row) {
+            $lastmodStr = $row['lastmod']->toAtomString();
             $xml .= '  <url>' . PHP_EOL;
-            $xml .= '    <loc>' . htmlspecialchars($url['loc'], ENT_QUOTES | ENT_XML1, 'UTF-8') . '</loc>' . PHP_EOL;
-            $xml .= '    <lastmod>' . $lastmod . '</lastmod>' . PHP_EOL;
-            $xml .= '    <changefreq>' . $url['changefreq'] . '</changefreq>' . PHP_EOL;
-            $xml .= '    <priority>' . $url['priority'] . '</priority>' . PHP_EOL;
+            $xml .= '    <loc>' . htmlspecialchars($row['loc'], ENT_QUOTES | ENT_XML1, 'UTF-8') . '</loc>' . PHP_EOL;
+            $xml .= '    <lastmod>' . $lastmodStr . '</lastmod>' . PHP_EOL;
+            $xml .= '    <changefreq>' . $row['changefreq'] . '</changefreq>' . PHP_EOL;
+            $xml .= '    <priority>' . $row['priority'] . '</priority>' . PHP_EOL;
             $xml .= '  </url>' . PHP_EOL;
         }
         $xml .= '</urlset>' . PHP_EOL;
@@ -44,8 +85,8 @@ class SeoController extends Controller
 
     public function robots(): Response
     {
-        $content = LandingPageContent::query()->first();
-        $base = rtrim($content?->canonical_url ?: config('app.url') ?: url('/'), '/');
+        ['base' => $base, 'content' => $content] = $this->siteContext();
+
         $robots = $content?->robots ?: 'index,follow';
         $disallowAll = str_contains($robots, 'noindex');
 
@@ -57,6 +98,7 @@ class SeoController extends Controller
             $lines[] = 'Allow: /';
             $lines[] = 'Disallow: /admin';
             $lines[] = 'Disallow: /admin/';
+            $lines[] = 'Disallow: /logs';
             $lines[] = 'Disallow: /storage/framework/';
             $lines[] = 'Disallow: /vendor/';
         }

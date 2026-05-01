@@ -29,6 +29,7 @@
                                 <img src="{{ $slide['photo'] }}"
                                      alt="{{ $slide['title'] }}"
                                      class="about-slide-img"
+                                     style="--mobile-focal: {{ $slide['photo_mobile_position'] ?? 'center top' }}"
                                      loading="{{ $i === 0 ? 'eager' : 'lazy' }}">
                             </picture>
                         </div>
