@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\LivewireSignedFileUploadController;
+use App\Support\Livewire\RelativeSignedUploadUrlGenerator;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Facades\GenerateSignedUploadUrlFacade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,6 +35,31 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->normalizeDriversForSqlite();
+
+        // После RouteServiceProvider::booted (loadRoutes / loadCachedRoutes), когда уже есть livewire.upload-file.
+        $this->app->booted(function (): void {
+            GenerateSignedUploadUrlFacade::swap(new RelativeSignedUploadUrlGenerator());
+
+            $route = null;
+            foreach (app('router')->getRoutes()->getRoutes() as $candidate) {
+                if ($candidate->getName() === 'livewire.upload-file') {
+                    $route = $candidate;
+                    break;
+                }
+            }
+
+            if ($route === null) {
+                return;
+            }
+
+            $route->setAction(array_merge($route->getAction(), [
+                'uses' => LivewireSignedFileUploadController::class.'@handle',
+                'controller' => LivewireSignedFileUploadController::class.'@handle',
+            ]));
+
+            app('router')->getRoutes()->refreshNameLookups();
+            app('router')->getRoutes()->refreshActionLookups();
+        });
     }
 
     /**
