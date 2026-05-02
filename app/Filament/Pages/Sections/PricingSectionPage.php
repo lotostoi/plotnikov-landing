@@ -122,7 +122,7 @@ class PricingSectionPage extends Page
                             ->live(),
 
                         Select::make('heading.meta.card_variant')
-                            ->label('Стиль карточки')
+                            ->label('Стиль карточки консультации')
                             ->options([
                                 'default'  => 'Default — рамка, градиент при ховере',
                                 'bordered' => 'Bordered — акцентная рамка',
@@ -130,6 +130,17 @@ class PricingSectionPage extends Page
                                 'elevated' => 'Elevated — без рамки, тень',
                             ])
                             ->default('default')
+                            ->native(false)
+                            ->live(),
+
+                        Select::make('heading.meta.promo_cols')
+                            ->label('Количество колонок акций (десктоп)')
+                            ->options([
+                                '2' => '½ экрана — 2 колонки',
+                                '3' => '⅓ экрана — 3 колонки',
+                                '1' => 'Полный экран — 1 колонка',
+                            ])
+                            ->default('3')
                             ->native(false)
                             ->live(),
 
@@ -290,6 +301,7 @@ class PricingSectionPage extends Page
                 'meta'        => [
                     'card_cols'    => $meta['card_cols'] ?? '2',
                     'card_variant' => $meta['card_variant'] ?? 'default',
+                    'promo_cols'   => $meta['promo_cols'] ?? '3',
                 ],
             ],
         );

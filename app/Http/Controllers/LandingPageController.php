@@ -350,6 +350,7 @@ class LandingPageController extends Controller
             ],
             'pricingCardCols'    => $pricingBlocks->where('block_key', 'heading')->first()?->meta['card_cols'] ?? '2',
             'pricingCardVariant' => $pricingBlocks->where('block_key', 'heading')->first()?->meta['card_variant'] ?? 'default',
+            'pricingPromoCols'   => $pricingBlocks->where('block_key', 'heading')->first()?->meta['promo_cols'] ?? '3',
             'pricingConsults' => $pricingBlocks
                 ->where('block_type', 'consult')
                 ->sortBy('sort_order')

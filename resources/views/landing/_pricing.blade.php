@@ -1,6 +1,7 @@
 @php
-    $colsClass    = 'pricing-grid--' . (in_array($pricingCardCols ?? '2', ['1', '2', '3']) ? ($pricingCardCols ?? '2') : '2');
-    $variantClass = ($pricingCardVariant ?? 'default') !== 'default' ? ' pricing-card--' . e($pricingCardVariant) : '';
+    $colsClass      = 'pricing-grid--' . (in_array($pricingCardCols ?? '2', ['1', '2', '3']) ? ($pricingCardCols ?? '2') : '2');
+    $variantClass   = ($pricingCardVariant ?? 'default') !== 'default' ? ' pricing-card--' . e($pricingCardVariant) : '';
+    $promoColsClass = 'pricing-grid--' . (in_array($pricingPromoCols ?? '3', ['1', '2', '3']) ? ($pricingPromoCols ?? '3') : '3');
 @endphp
 
 <section id="pricing" class="relative overflow-hidden py-20 md:py-28">
@@ -64,7 +65,7 @@
 
         {{-- Акции --}}
         @if (!empty($pricingPromos))
-        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-reveal>
+        <div class="grid gap-5 pricing-grid {{ $promoColsClass }}" data-reveal>
             @foreach ($pricingPromos as $promo)
             <article class="promo-card p-6 md:p-7">
                 <div class="ribbon">
