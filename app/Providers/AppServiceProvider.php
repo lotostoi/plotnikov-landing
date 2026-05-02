@@ -20,6 +20,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Livewire/Filament: временная загрузка файлов идёт на signed URL. Подпись считается по
+        // полному базовому URL; без фиксации корня за nginx/Cloudflare генерация и POST могут разъехаться → 401.
+        $root = rtrim((string) config('app.url'), '/');
+        if ($root !== '') {
+            URL::forceRootUrl($root);
+        }
+
         if ($this->app->environment('production') || (bool) config('app.force_https')) {
             URL::forceScheme('https');
         }
