@@ -16,6 +16,9 @@ if [ -f .env ]; then
     set +a
 fi
 
+echo "[deploy] fixing ownership of Docker-written files"
+sudo chown -R "$(id -u):$(id -g)" . 2>/dev/null || true
+
 echo "[deploy] fetching branch ${BRANCH}"
 git fetch --all --prune
 git reset --hard "origin/${BRANCH}"
