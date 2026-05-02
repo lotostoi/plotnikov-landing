@@ -348,6 +348,8 @@ class LandingPageController extends Controller
                 'title'    => $pricingBlocks->where('block_key', 'heading')->first()?->title ?: 'Форматы',
                 'subtitle' => $pricingBlocks->where('block_key', 'heading')->first()?->subtitle ?: 'и стоимость',
             ],
+            'pricingCardCols'    => $pricingBlocks->where('block_key', 'heading')->first()?->meta['card_cols'] ?? '2',
+            'pricingCardVariant' => $pricingBlocks->where('block_key', 'heading')->first()?->meta['card_variant'] ?? 'default',
             'pricingConsults' => $pricingBlocks
                 ->where('block_type', 'consult')
                 ->sortBy('sort_order')

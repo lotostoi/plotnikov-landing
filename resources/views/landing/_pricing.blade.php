@@ -1,3 +1,8 @@
+@php
+    $colsClass    = 'pricing-grid--' . (in_array($pricingCardCols ?? '2', ['1', '2', '3']) ? ($pricingCardCols ?? '2') : '2');
+    $variantClass = ($pricingCardVariant ?? 'default') !== 'default' ? ' pricing-card--' . e($pricingCardVariant) : '';
+@endphp
+
 <section id="pricing" class="relative overflow-hidden py-20 md:py-28">
     <div class="glow glow-theme glow-pulse-theme"
          style="top:10%; left:50%; transform:translateX(-50%); width:30rem; height:30rem; z-index:0; opacity:.12;"></div>
@@ -14,11 +19,11 @@
 
         {{-- Карточки консультаций --}}
         @if (!empty($pricingConsults))
-        <div class="grid gap-6 sm:grid-cols-2 mb-8" data-reveal>
+        <div class="grid gap-6 mb-8 pricing-grid {{ $colsClass }}" data-reveal>
             @foreach ($pricingConsults as $consult)
             <article @class([
-                'pricing-card',
-                'md:col-span-2' => ($consult['desktop_span'] ?? 'half') === 'full',
+                'pricing-card' . $variantClass,
+                'pricing-card--full' => ($consult['desktop_span'] ?? 'half') === 'full',
             ])>
                 <div class="pricing-card__header">
                     <div class="pricing-card__icon">

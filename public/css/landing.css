@@ -1582,6 +1582,63 @@ button { font-family: inherit; }
 }
 .pricing-card__cta:hover { opacity: .88; gap: .7rem; }
 
+/* --- Варианты карточек консультаций (card_variant) --- */
+
+/* Bordered: акцентная рамка, чуть ярче hover */
+.pricing-card--bordered {
+    border-width: 2px;
+    border-color: rgba(var(--theme-gradient-from-rgb, 245,158,11), .28);
+}
+.pricing-card--bordered:hover {
+    border-color: rgba(var(--theme-gradient-from-rgb, 245,158,11), .6);
+}
+
+/* Minimal: подчёркивание, прозрачный фон */
+.pricing-card--minimal {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--border);
+    border-radius: .5rem;
+    box-shadow: none;
+}
+.pricing-card--minimal:hover {
+    background: var(--muted, rgba(0,0,0,.03));
+    border-bottom-color: var(--theme-gradient-from);
+    transform: none;
+    box-shadow: none;
+}
+
+/* Elevated: без рамки, заметная тень */
+.pricing-card--elevated {
+    border: none;
+    box-shadow: 0 8px 32px -8px rgba(0,0,0,.14), 0 2px 8px -2px rgba(0,0,0,.07);
+}
+.pricing-card--elevated:hover {
+    box-shadow: 0 20px 56px -12px rgba(0,0,0,.2), 0 4px 16px -4px rgba(0,0,0,.1);
+    transform: translateY(-3px);
+    border-color: transparent;
+}
+
+/* Полноширинная карточка в любой сетке */
+.pricing-card--full { grid-column: 1 / -1; }
+
+/* --- Сетка карточек консультаций (card_cols) --- */
+/* Mobile: всегда 1 колонка */
+.pricing-grid--1,
+.pricing-grid--2,
+.pricing-grid--3 { }
+
+@media (min-width: 640px) {
+    .pricing-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pricing-grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+    .pricing-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    /* --2: остаётся 2 колонки */
+    /* --1: остаётся 1 колонка */
+}
+
 /* ===== Секция «Образование» ===== */
 
 /* --- Переменные акцентов (как у issue-card) --- */

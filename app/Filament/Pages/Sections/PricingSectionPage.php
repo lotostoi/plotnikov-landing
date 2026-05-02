@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages\Sections;
 
 use App\Models\LandingBlock;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -13,8 +14,10 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\HtmlString;
 use UnitEnum;
 
 class PricingSectionPage extends Page
@@ -48,16 +51,16 @@ class PricingSectionPage extends Page
                 $meta = $b->meta ?? [];
 
                 return [
-                    'title'          => $b->title,
-                    'subtitle'       => $b->subtitle,
-                    'badge'          => $b->badge,
-                    'label'          => $b->label,
-                    'body'           => $b->body,
-                    'button_text'    => $b->button_text,
-                    'button_url'     => $b->button_url,
-                    'is_visible'     => $b->is_visible ?? true,
-                    'desktop_span'   => $meta['desktop_span'] ?? 'half',
-                    'subtitle_icon'  => $meta['subtitle_icon'] ?? ($b->block_key === 'offline' ? 'map-pin' : 'globe'),
+                    'title'         => $b->title,
+                    'subtitle'      => $b->subtitle,
+                    'badge'         => $b->badge,
+                    'label'         => $b->label,
+                    'body'          => $b->body,
+                    'button_text'   => $b->button_text,
+                    'button_url'    => $b->button_url,
+                    'is_visible'    => $b->is_visible ?? true,
+                    'desktop_span'  => $meta['desktop_span'] ?? 'half',
+                    'subtitle_icon' => $meta['subtitle_icon'] ?? ($b->block_key === 'offline' ? 'map-pin' : 'globe'),
                 ];
             })
             ->values()
@@ -71,10 +74,11 @@ class PricingSectionPage extends Page
 
         $this->form->fill([
             'heading' => [
-                'badge'       => $heading?->badge,
-                'title'       => $heading?->title,
-                'subtitle'    => $heading?->subtitle,
-                'is_visible'  => $heading?->is_visible ?? true,
+                'badge'      => $heading?->badge,
+                'title'      => $heading?->title,
+                'subtitle'   => $heading?->subtitle,
+                'is_visible' => $heading?->is_visible ?? true,
+                'meta'       => $heading?->meta ?? [],
             ],
             'consults' => $consults,
             'promos'   => $promos->map(fn (LandingBlock $b): array => [
@@ -100,6 +104,45 @@ class PricingSectionPage extends Page
                         TextInput::make('heading.title')->label('Первая строка')->placeholder('Форматы')->maxLength(255),
                         TextInput::make('heading.subtitle')->label('Вторая строка')->placeholder('и стоимость')->maxLength(255),
                         Toggle::make('heading.is_visible')->label('Показывать секцию')->default(true)->columnSpanFull(),
+                    ]),
+
+                Section::make('Вид карточек консультаций')
+                    ->description('Настройте сетку и стиль. Превью обновляется при изменении.')
+                    ->columns(2)
+                    ->schema([
+                        Select::make('heading.meta.card_cols')
+                            ->label('Количество колонок (десктоп)')
+                            ->options([
+                                '2' => '½ экрана — 2 колонки',
+                                '3' => '⅓ экрана — 3 колонки',
+                                '1' => 'Полный экран — 1 колонка',
+                            ])
+                            ->default('2')
+                            ->native(false)
+                            ->live(),
+
+                        Select::make('heading.meta.card_variant')
+                            ->label('Стиль карточки')
+                            ->options([
+                                'default'  => 'Default — рамка, градиент при ховере',
+                                'bordered' => 'Bordered — акцентная рамка',
+                                'minimal'  => 'Minimal — подчёркивание, без фона',
+                                'elevated' => 'Elevated — без рамки, тень',
+                            ])
+                            ->default('default')
+                            ->native(false)
+                            ->live(),
+
+                        Placeholder::make('pricing_card_preview')
+                            ->label('Превью — светлая и тёмная тема')
+                            ->dehydrated(false)
+                            ->live()
+                            ->content(function (Get $get): HtmlString {
+                                $cols    = $get('heading.meta.card_cols') ?: '2';
+                                $variant = $get('heading.meta.card_variant') ?: 'default';
+                                return new HtmlString(self::buildCardPreview($cols, $variant));
+                            })
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make('Карточки консультаций')
@@ -138,10 +181,10 @@ class PricingSectionPage extends Page
                                     ->default('globe'),
 
                                 Select::make('desktop_span')
-                                    ->label('Ширина на десктопе (от md)')
+                                    ->label('Ширина этой карточки (десктоп)')
                                     ->options([
-                                        'half' => 'Половина ряда — две карточки в ряд',
-                                        'full' => 'На всю ширину сетки (одна карточка в ряд)',
+                                        'half' => 'Обычная — заполняет один слот сетки',
+                                        'full' => 'Полная ширина — на весь ряд',
                                     ])
                                     ->default('half')
                                     ->columnSpanFull(),
@@ -227,6 +270,8 @@ class PricingSectionPage extends Page
         $state = $this->form->getState();
 
         $heading = $state['heading'] ?? [];
+        $meta    = $heading['meta'] ?? [];
+
         LandingBlock::updateOrCreate(
             [
                 'section_code' => 'pricing',
@@ -242,7 +287,10 @@ class PricingSectionPage extends Page
                 'body'        => null,
                 'button_text' => null,
                 'button_url'  => null,
-                'meta'        => null,
+                'meta'        => [
+                    'card_cols'    => $meta['card_cols'] ?? '2',
+                    'card_variant' => $meta['card_variant'] ?? 'default',
+                ],
             ],
         );
 
@@ -301,5 +349,123 @@ class PricingSectionPage extends Page
         }
 
         Notification::make()->title('Сохранено')->success()->send();
+    }
+
+    /**
+     * Inline-styled HTML-превью карточек консультаций в светлой и тёмной теме.
+     */
+    private static function buildCardPreview(string $cols, string $variant): string
+    {
+        $sampleCards = [
+            [
+                'emoji' => '🎥',
+                'title' => 'Онлайн',
+                'sub'   => '🌐 Из любой точки мира',
+                'price' => '3 500 руб.',
+                'items' => ['55 минут', 'Zoom / Telegram', 'Запись сессии по запросу'],
+            ],
+            [
+                'emoji' => '📍',
+                'title' => 'Очно',
+                'sub'   => '📌 Владивосток, Артём',
+                'price' => '3 500 руб.',
+                'items' => ['55 минут', 'Приватный кабинет', 'Гибкий график'],
+            ],
+            [
+                'emoji' => '🔄',
+                'title' => 'Регулярная терапия',
+                'sub'   => '🌐 Онлайн или очно',
+                'price' => '2 000 руб.',
+                'items' => ['1 раз в неделю', 'Скидка при регулярности', 'Осталось 2 места'],
+            ],
+        ];
+
+        $colsInt      = max(1, min(3, (int) $cols));
+        $cardCount    = min($colsInt === 1 ? 2 : $colsInt, 3);
+        $previewCards = array_slice($sampleCards, 0, $cardCount);
+        $gridCols     = $colsInt === 1 ? '1fr' : "repeat({$colsInt}, 1fr)";
+        $gridStyle    = "display:grid;grid-template-columns:{$gridCols};gap:8px;";
+
+        $accent = '#f59e0b';
+
+        $themes = [
+            [
+                'label'  => '☀ Светлая тема',
+                'bg'     => '#fdf8f0',
+                'cardBg' => '#ffffff',
+                'border' => '#e5dcc5',
+                'title'  => '#1a1210',
+                'sub'    => '#7c6c5c',
+                'price'  => '#c87920',
+                'item'   => '#6c6050',
+                'meta'   => '#a09080',
+                'btn'    => '#c87920',
+            ],
+            [
+                'label'  => '🌙 Тёмная тема',
+                'bg'     => '#14171c',
+                'cardBg' => '#1e2128',
+                'border' => '#2d3139',
+                'title'  => '#e8ddd0',
+                'sub'    => '#8a8a9a',
+                'price'  => '#f59e0b',
+                'item'   => '#888896',
+                'meta'   => '#555566',
+                'btn'    => '#f59e0b',
+            ],
+        ];
+
+        $renderCard = static function (array $c, array $t, string $v) use ($accent): string {
+            $baseStyle = match ($v) {
+                'bordered' => "display:flex;flex-direction:column;gap:.7rem;padding:1.1rem 1.2rem;"
+                    . "border-radius:12px;border:2px solid {$accent}44;background:{$t['cardBg']};",
+
+                'minimal'  => "display:flex;flex-direction:column;gap:.7rem;padding:1.1rem 1.2rem 1.3rem;"
+                    . "border-radius:0;border:none;border-bottom:2px solid {$t['border']};background:transparent;",
+
+                'elevated' => "display:flex;flex-direction:column;gap:.7rem;padding:1.1rem 1.2rem;"
+                    . "border-radius:12px;border:none;background:{$t['cardBg']};"
+                    . "box-shadow:0 8px 24px -8px rgba(0,0,0,.18);",
+
+                default    => "display:flex;flex-direction:column;gap:.7rem;padding:1.1rem 1.2rem;"
+                    . "border-radius:12px;border:1px solid {$t['border']};background:{$t['cardBg']};",
+            };
+
+            $iconHtml  = "<span style='font-size:1.3rem;'>{$c['emoji']}</span>";
+            $titleHtml = "<span style='font-size:.83rem;font-weight:700;color:{$t['title']};'>{$c['title']}</span>";
+            $subHtml   = "<span style='font-size:.7rem;color:{$t['sub']};'>{$c['sub']}</span>";
+            $priceHtml = "<span style='font-size:1.25rem;font-weight:800;color:{$t['price']};'>{$c['price']}</span>";
+
+            $itemsHtml = '';
+            foreach (array_slice($c['items'], 0, 2) as $item) {
+                $itemsHtml .= "<div style='font-size:.7rem;color:{$t['item']};'>✓ {$item}</div>";
+            }
+
+            $btnHtml = "<span style='display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;"
+                . "font-weight:700;color:#fff;padding:.35rem .9rem;border-radius:99px;"
+                . "background:{$t['btn']};align-self:flex-start;margin-top:auto;'>Записаться →</span>";
+
+            return "<div style='{$baseStyle}'>"
+                . "<div style='display:flex;align-items:center;gap:.5rem;'>{$iconHtml}{$titleHtml}</div>"
+                . $subHtml . $priceHtml . $itemsHtml . $btnHtml
+                . "</div>";
+        };
+
+        $html = '<div style="display:flex;gap:10px;font-family:Manrope,system-ui,sans-serif;">';
+
+        foreach ($themes as $t) {
+            $html .= "<div style='flex:1;min-width:0;background:{$t['bg']};padding:10px;border-radius:9px;'>";
+            $html .= "<p style='font-size:10px;text-transform:uppercase;letter-spacing:.07em;"
+                . "color:{$t['meta']};margin:0 0 7px;font-weight:600;'>{$t['label']}</p>";
+            $html .= "<div style='{$gridStyle}'>";
+            foreach ($previewCards as $card) {
+                $html .= $renderCard($card, $t, $variant);
+            }
+            $html .= '</div></div>';
+        }
+
+        $html .= '</div>';
+
+        return $html;
     }
 }
