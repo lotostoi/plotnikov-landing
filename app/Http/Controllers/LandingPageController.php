@@ -340,6 +340,8 @@ class LandingPageController extends Controller
             ],
             'serviceIssues' => $serviceIssues,
             'serviceFormats' => $serviceFormats,
+            'serviceCardCols' => $serviceHeading?->meta['card_cols'] ?? '3',
+            'serviceCardVariant' => $serviceHeading?->meta['card_variant'] ?? 'default',
 
             'pricingHeading' => [
                 'badge'    => $pricingBlocks->where('block_key', 'heading')->first()?->badge ?: 'Консультации',

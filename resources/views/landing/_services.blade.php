@@ -1,3 +1,8 @@
+@php
+    $colsClass    = 'services-grid--' . (in_array($serviceCardCols ?? '3', ['1', '2', '3']) ? ($serviceCardCols ?? '3') : '3');
+    $variantClass = ($serviceCardVariant ?? 'default') !== 'default' ? ' issue-card--' . e($serviceCardVariant) : '';
+@endphp
+
 <section id="services" class="relative overflow-hidden py-20 md:py-28">
     <div class="services-bg"></div>
     @include('landing._floating', ['variant' => 'services'])
@@ -11,9 +16,9 @@
             <p class="text-lg text-muted-foreground">{{ $serviceHeading['description'] }}</p>
         </div>
 
-        <div class="mb-20 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="mb-20 grid gap-5 services-grid {{ $colsClass }}">
             @foreach ($serviceIssues as $i => $issue)
-                <article class="issue-card"
+                <article class="issue-card{{ $variantClass }}"
                          data-accent="{{ $issue['accent'] }}"
                          data-reveal data-reveal-group="services-issues">
 

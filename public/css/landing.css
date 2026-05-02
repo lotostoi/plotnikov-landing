@@ -672,6 +672,42 @@ button { font-family: inherit; }
     opacity: 1;
 }
 
+/* --- Варианты карточек (card_variant) --- */
+
+/* Minimal: без фонового числа и декоративной полоски, уменьшенный паддинг */
+.issue-card--minimal .issue-card__num,
+.issue-card--minimal .issue-card__line { display: none; }
+.issue-card--minimal { padding: 1.5rem; gap: 0.75rem; }
+
+/* Bordered: цветная рамка слева, без фонового числа и линии */
+.issue-card--bordered {
+    border-left: 4px solid var(--ic, var(--theme-gradient-from));
+    border-radius: var(--radius);
+}
+.issue-card--bordered .issue-card__num,
+.issue-card--bordered .issue-card__line { display: none; }
+
+/* Filled: заливка акцентным цветом, число чуть заметнее */
+.issue-card--filled { background: var(--ic-bg, rgba(245,158,11,.10)); }
+.issue-card--filled .issue-card__num { opacity: 0.12; }
+
+/* --- Сетка карточек (card_cols) --- */
+/* Mobile (< 640 px): всегда 1 колонка */
+.services-grid--1,
+.services-grid--2,
+.services-grid--3 { }
+
+@media (min-width: 640px) {
+    .services-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .services-grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+    .services-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    /* --2: остаётся 2 колонки на lg */
+    /* --1: остаётся 1 колонка на всех размерах */
+}
+
 /* ===== About — полноширинный слайдер (фото + текст) ===== */
 
 /* Секция: мобайл — тоже 100svh, десктоп — 100svh */
