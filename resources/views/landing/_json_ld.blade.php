@@ -87,15 +87,6 @@
     if (! empty($sameAs)) {
         $business['sameAs'] = $sameAs;
     }
-    if ($content->aggregate_rating_value && $content->aggregate_rating_count) {
-        $business['aggregateRating'] = [
-            '@type' => 'AggregateRating',
-            'ratingValue' => (float) $content->aggregate_rating_value,
-            'reviewCount' => (int) $content->aggregate_rating_count,
-            'bestRating' => 5,
-            'worstRating' => 1,
-        ];
-    }
 
     // Каталог услуг с ценами
     $offerCatalog = [
