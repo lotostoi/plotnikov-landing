@@ -6,9 +6,12 @@ namespace App\Http\Controllers;
 
 use App\Models\LandingBlock;
 use App\Models\LandingPageContent;
+use App\Models\LandingPageViewLog;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 class ClusterPageController extends Controller
 {
@@ -27,16 +30,21 @@ class ClusterPageController extends Controller
                 'seo_keywords'    => 'психолог онлайн, консультация психолога онлайн, онлайн психотерапия, гештальт-терапевт онлайн, психолог по Zoom',
                 'canonical_path'  => '/psiholog-online',
                 'h1'              => 'Психолог онлайн',
-                'h1_sub'          => 'для вас — из любой точки мира',
+                'h1_sub'          => 'из любой точки мира',
                 'badge'           => 'Онлайн-консультации',
                 'description'     => 'Работаю с людьми по всему миру через Zoom, Telegram и мессенджеры. Расписание строится удобно для вашего часового пояса — без привязки к географии.',
                 'benefits'        => [
-                    ['icon' => 'globe', 'text' => 'Любая страна и часовой пояс'],
-                    ['icon' => 'video', 'text' => 'Zoom, Skype или мессенджеры — на ваш выбор'],
+                    ['icon' => 'globe',  'text' => 'Любая страна и часовой пояс'],
+                    ['icon' => 'video',  'text' => 'Zoom или мессенджеры — на ваш выбор'],
                     ['icon' => 'shield', 'text' => 'Полная конфиденциальность'],
-                    ['icon' => 'clock', 'text' => '55 минут — стандартная сессия'],
+                    ['icon' => 'clock',  'text' => '55 минут — стандартная сессия'],
                 ],
-                'schema_type'     => 'online',
+                'stats' => [
+                    ['value' => '15+', 'label' => 'лет практики'],
+                    ['value' => '15',  'label' => 'мин — бесплатный созвон'],
+                    ['value' => '55',  'label' => 'мин / сессия'],
+                ],
+                'schema_type' => 'online',
             ],
             'geshtalt-terapevt' => [
                 'seo_title'       => 'Гештальт-терапевт Александр Плотников | Владивосток и онлайн',
@@ -48,12 +56,17 @@ class ClusterPageController extends Controller
                 'badge'           => 'Гештальт-терапия',
                 'description'     => 'Гештальт-терапия помогает вернуть контакт с собой, разобраться в отношениях и найти опору в настоящем моменте. Работаю в гештальт-подходе 15+ лет — индивидуально и в группах.',
                 'benefits'        => [
-                    ['icon' => 'heart', 'text' => '15+ лет практики в гештальт-подходе'],
-                    ['icon' => 'users', 'text' => '10+ лет ведения групповой терапии'],
-                    ['icon' => 'award', 'text' => 'Профессиональная супервизия и личная терапия'],
+                    ['icon' => 'heart',   'text' => '15+ лет практики в гештальт-подходе'],
+                    ['icon' => 'users',   'text' => '10+ лет ведения групповой терапии'],
+                    ['icon' => 'award',   'text' => 'Супервизия и личная терапия'],
                     ['icon' => 'compass', 'text' => 'КПТ, трансактный анализ, процессуальная психология'],
                 ],
-                'schema_type'     => 'gestalt',
+                'stats' => [
+                    ['value' => '15+', 'label' => 'лет практики'],
+                    ['value' => '15',  'label' => 'мин — бесплатный созвон'],
+                    ['value' => '55',  'label' => 'мин / сессия'],
+                ],
+                'schema_type' => 'gestalt',
             ],
             'psiholog-vladivostok' => [
                 'seo_title'       => 'Психолог Владивосток — Александр Плотников | Очный и онлайн приём',
@@ -66,11 +79,16 @@ class ClusterPageController extends Controller
                 'description'     => 'Принимаю очно во Владивостоке и онлайн. Помогаю взрослым разобраться в отношениях, справиться с тревогой, найти направление и опору в жизни.',
                 'benefits'        => [
                     ['icon' => 'map-pin', 'text' => 'Очный приём во Владивостоке'],
-                    ['icon' => 'video', 'text' => 'Онлайн — для тех, кто занят или в другом городе'],
-                    ['icon' => 'clock', 'text' => 'Приём по будням и выходным 09:00–21:00'],
-                    ['icon' => 'phone', 'text' => 'Первый созвон 15 минут — бесплатно'],
+                    ['icon' => 'video',   'text' => 'Онлайн — из любого места'],
+                    ['icon' => 'clock',   'text' => 'Пн–Вс 09:00–21:00'],
+                    ['icon' => 'phone',   'text' => 'Первый созвон — бесплатно'],
                 ],
-                'schema_type'     => 'local_vladivostok',
+                'stats' => [
+                    ['value' => '15+', 'label' => 'лет практики'],
+                    ['value' => '15',  'label' => 'мин — бесплатный созвон'],
+                    ['value' => '55',  'label' => 'мин / сессия'],
+                ],
+                'schema_type' => 'local_vladivostok',
             ],
             'psiholog-artem' => [
                 'seo_title'       => 'Психолог Артём — Александр Плотников | Очный приём и онлайн',
@@ -83,11 +101,16 @@ class ClusterPageController extends Controller
                 'description'     => 'Принимаю очно в Артёме и онлайн. Помогаю справиться с тревогой, кризисами и трудностями в отношениях. 15 лет практики, мягкий и бережный подход.',
                 'benefits'        => [
                     ['icon' => 'map-pin', 'text' => 'Очный приём в Артёме'],
-                    ['icon' => 'video', 'text' => 'Онлайн из любого места'],
-                    ['icon' => 'clock', 'text' => 'Гибкое расписание 09:00–21:00'],
-                    ['icon' => 'phone', 'text' => 'Первый созвон 15 минут — бесплатно'],
+                    ['icon' => 'video',   'text' => 'Онлайн из любого места'],
+                    ['icon' => 'clock',   'text' => 'Гибкое расписание 09:00–21:00'],
+                    ['icon' => 'phone',   'text' => 'Первый созвон — бесплатно'],
                 ],
-                'schema_type'     => 'local_artem',
+                'stats' => [
+                    ['value' => '15+', 'label' => 'лет практики'],
+                    ['value' => '15',  'label' => 'мин — бесплатный созвон'],
+                    ['value' => '55',  'label' => 'мин / сессия'],
+                ],
+                'schema_type' => 'local_artem',
             ],
         ];
     }
@@ -114,6 +137,7 @@ class ClusterPageController extends Controller
         $tgUrl  = 'https://t.me/AlexanderP_V';
         $waUrl  = 'https://wa.me/79242521756';
         $maxUrl = 'https://max.ru/u/f9LHodD0cOIZh45J-Dg2owlXzPWe-IUg2R7DDGo-yx1QdDAdLYK1SUWEHxM';
+        $onlinePrice = null;
 
         if (Schema::hasTable('landing_blocks')) {
             $blocks = LandingBlock::query()->visible()->ordered()->get()->groupBy('section_code');
@@ -137,16 +161,30 @@ class ClusterPageController extends Controller
                 ->values();
 
             $contactBlocks = $blocks->get('contacts', collect());
-            $tgBlock = $contactBlocks->firstWhere('block_key', 'cta_telegram');
-            $waBlock = $contactBlocks->firstWhere('block_key', 'cta_whatsapp');
+            $tgBlock  = $contactBlocks->firstWhere('block_key', 'cta_telegram');
+            $waBlock  = $contactBlocks->firstWhere('block_key', 'cta_whatsapp');
             $maxBlock = $contactBlocks->firstWhere('block_key', 'cta_max');
 
             $tgUrl  = $tgBlock?->button_url  ?: $content?->telegram_url  ?: $tgUrl;
             $waUrl  = $waBlock?->button_url  ?: $content?->whatsapp_url  ?: $waUrl;
             $maxUrl = $maxBlock?->button_url ?: $maxUrl;
+
+            // Цена онлайн-консультации из блока pricing → online (хранится в поле badge)
+            $onlineBlock = $blocks->get('pricing', collect())->firstWhere('block_key', 'online');
+            $onlinePrice = $onlineBlock?->badge ?: null;
+        }
+
+        if ($content) {
+            $this->recordView($content->id, $cluster['canonical_path']);
         }
 
         $heroImage = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7896_resized-nd2q5Sfs8MaKUDmtG8jYjZkb33cvj6.jpeg';
+
+        // Третий стат — цена онлайн-консультации из поля price_regular в админке
+        $priceRegular = $content?->price_regular;
+        $cluster['stats'][2] = $priceRegular
+            ? ['value' => 'от ' . number_format((int) $priceRegular, 0, '.', ' ') . ' ₽', 'label' => 'онлайн-сессия']
+            : ['value' => '55', 'label' => 'мин / сессия'];
 
         $personFullName = $content?->person_full_name ?: 'Александр Плотников';
         $personPhone    = $content?->person_phone;
@@ -245,5 +283,45 @@ class ClusterPageController extends Controller
     public function slugs(): array
     {
         return array_keys($this->clusters());
+    }
+
+    private function recordView(int $contentId, string $page): void
+    {
+        try {
+            DB::table('landing_page_contents')
+                ->where('id', $contentId)
+                ->update([
+                    'landing_page_views_count' => DB::raw('landing_page_views_count + 1'),
+                    'landing_page_last_view_at' => now(),
+                ]);
+
+            if (! Schema::hasTable('landing_page_view_logs')) {
+                return;
+            }
+
+            $ua = (string) (request()->userAgent() ?? '');
+
+            $data = [
+                'landing_page_content_id' => $contentId,
+                'viewed_at'               => now(),
+                'ip'                      => request()->ip(),
+                'user_agent'              => $ua ?: null,
+                'device'                  => LandingPageViewLog::detectDevice($ua),
+                'referrer'                => request()->header('referer') ?: null,
+                'utm_source'              => request()->query('utm_source') ?: null,
+                'utm_medium'              => request()->query('utm_medium') ?: null,
+                'utm_campaign'            => request()->query('utm_campaign') ?: null,
+                'utm_term'                => request()->query('utm_term') ?: null,
+                'utm_content'             => request()->query('utm_content') ?: null,
+            ];
+
+            if (Schema::hasColumn('landing_page_view_logs', 'page')) {
+                $data['page'] = $page;
+            }
+
+            LandingPageViewLog::query()->create($data);
+        } catch (Throwable) {
+            // Не роняем страницу при ошибках БД.
+        }
     }
 }

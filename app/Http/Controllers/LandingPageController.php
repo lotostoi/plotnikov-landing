@@ -23,7 +23,7 @@ class LandingPageController extends Controller
             $content = LandingPageContent::query()->create($this->defaults());
         }
 
-        $this->recordLandingPageView($content->id);
+        $this->recordLandingPageView($content->id, '/');
 
         $images = [
             'hero'      => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7896_resized-nd2q5Sfs8MaKUDmtG8jYjZkb33cvj6.jpeg',
@@ -578,7 +578,7 @@ class LandingPageController extends Controller
      * Счётчик для личного контроля в админке. Обновление через query builder,
      * чтобы не трогать updated_at (он участвует в lastmod sitemap).
      */
-    private function recordLandingPageView(int $contentId): void
+    private function recordLandingPageView(int $contentId, string $page = '/'): void
     {
         try {
             DB::table('landing_page_contents')
@@ -591,7 +591,7 @@ class LandingPageController extends Controller
             if (Schema::hasTable('landing_page_view_logs')) {
                 $ua = (string) (request()->userAgent() ?? '');
 
-                LandingPageViewLog::query()->create([
+                $data = [
                     'landing_page_content_id' => $contentId,
                     'viewed_at'               => now(),
                     'ip'                      => request()->ip(),
@@ -603,7 +603,13 @@ class LandingPageController extends Controller
                     'utm_campaign'            => request()->query('utm_campaign') ?: null,
                     'utm_term'                => request()->query('utm_term') ?: null,
                     'utm_content'             => request()->query('utm_content') ?: null,
-                ]);
+                ];
+
+                if (Schema::hasColumn('landing_page_view_logs', 'page')) {
+                    $data['page'] = $page;
+                }
+
+                LandingPageViewLog::query()->create($data);
             }
         } catch (Throwable) {
             // Не роняем лендинг при readonly SQLite / неверном DB_DATABASE в кэше.

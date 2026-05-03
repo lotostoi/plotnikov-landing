@@ -31,7 +31,8 @@ class VisitsLogPage extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        $hasNewColumns = Schema::hasColumn('landing_page_view_logs', 'ip');
+        $hasNewColumns  = Schema::hasColumn('landing_page_view_logs', 'ip');
+        $hasPageColumn  = Schema::hasColumn('landing_page_view_logs', 'page');
 
         return $table
             ->query(
@@ -43,6 +44,19 @@ class VisitsLogPage extends Page implements HasTable
                     ->dateTime('d.m.Y H:i:s')
                     ->timezone(config('app.timezone') ?: 'UTC')
                     ->sortable(),
+
+                $hasPageColumn ? TextColumn::make('page')
+                    ->label('Страница')
+                    ->badge()
+                    ->color(fn (?string $state): string => match (true) {
+                        $state === '/'                      => 'success',
+                        str_starts_with((string) $state, '/psiholog-online')      => 'info',
+                        str_starts_with((string) $state, '/geshtalt-terapevt')    => 'warning',
+                        str_starts_with((string) $state, '/psiholog-vladivostok') => 'primary',
+                        str_starts_with((string) $state, '/psiholog-artem')       => 'gray',
+                        default => 'gray',
+                    })
+                    ->sortable() : null,
 
                 $hasNewColumns ? TextColumn::make('device')
                     ->label('Устройство')
@@ -114,6 +128,16 @@ class VisitsLogPage extends Page implements HasTable
                     ->toggleable(isToggledHiddenByDefault: true) : null,
             ])))
             ->filters(array_values(array_filter([
+                $hasPageColumn ? SelectFilter::make('page')
+                    ->label('Страница')
+                    ->options([
+                        '/'                      => '🏠 Главная',
+                        '/psiholog-online'       => '🌐 Психолог онлайн',
+                        '/geshtalt-terapevt'     => '🧠 Гештальт-терапевт',
+                        '/psiholog-vladivostok'  => '📍 Психолог Владивосток',
+                        '/psiholog-artem'        => '📍 Психолог Артём',
+                    ]) : null,
+
                 $hasNewColumns ? SelectFilter::make('device')
                     ->label('Устройство')
                     ->options([

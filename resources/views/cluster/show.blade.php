@@ -3,9 +3,6 @@
         ? ($content?->default_theme ?? 'warm')
         : 'warm';
     $faviconUrl = $content?->faviconResolvedUrl();
-    $personPhone = $content?->person_phone;
-    $personEmail = $content?->person_email;
-    $locationText = $content?->location_text ?: 'Владивосток, Артём';
 @endphp
 <!DOCTYPE html>
 <html lang="ru" data-theme="{{ $defaultTheme }}" data-default-theme="{{ $defaultTheme }}" prefix="og: https://ogp.me/ns#">
@@ -24,7 +21,6 @@
     <link rel="alternate" hreflang="ru" href="{{ $canonical }}">
     <link rel="alternate" hreflang="x-default" href="{{ $canonical }}">
 
-    {{-- Open Graph --}}
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ru_RU">
     <meta property="og:url" content="{{ $canonical }}">
@@ -35,8 +31,6 @@
     <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-
-    {{-- Twitter Card --}}
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $cluster['seo_title'] }}">
     <meta name="twitter:description" content="{{ $cluster['seo_description'] }}">
@@ -48,17 +42,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+    <link rel="preload" as="image" href="{{ $heroImage }}" fetchpriority="high">
     <link rel="stylesheet" href="{{ asset('css/tailwind.css') }}?v={{ filemtime(public_path('css/tailwind.css')) }}">
     <script src="https://unpkg.com/lucide@latest" defer></script>
     <link rel="stylesheet" href="{{ asset('css/landing.css') }}?v={{ filemtime(public_path('css/landing.css')) }}">
 
-    {{-- JSON-LD --}}
     <script type="application/ld+json">
     {!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
     </script>
 
-    {{-- Anti-flash для темы --}}
     <script>
         (function () {
             try {
@@ -77,7 +69,7 @@
     <header class="site-header sticky top-0 z-50 w-full">
         <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
             <a href="{{ $canonicalBase }}/" class="group flex items-center gap-2 text-foreground hover:opacity-80 transition-opacity">
-                <i data-lucide="arrow-left" style="width:16px;height:16px;" class="text-muted-foreground"></i>
+                <i data-lucide="arrow-left" style="width:17px;height:17px;" class="text-muted-foreground"></i>
                 <span class="text-xl font-bold tracking-tight theme-gradient-text">{{ $personFullName }}</span>
                 <span class="hidden text-sm sm:inline-block text-muted-foreground">/ психолог</span>
             </a>
@@ -86,25 +78,23 @@
                     <i data-lucide="moon" class="icon-moon" style="width:20px;height:20px"></i>
                     <i data-lucide="sun"  class="icon-sun"  style="width:20px;height:20px"></i>
                 </button>
-                <a href="#contacts" class="btn btn-sm btn-theme">Записаться</a>
+                <a href="{{ $tgUrl }}" target="_blank" rel="noopener" class="btn btn-sm btn-theme">Записаться</a>
             </div>
         </div>
     </header>
 
     <main>
-
-        {{-- Hero --}}
         <section id="top" class="hero-section relative overflow-x-hidden">
             <div class="hero-bg"></div>
+            @include('landing._floating', ['variant' => 'hero'])
             <div class="noise-overlay"></div>
 
             <div class="hero-container relative mx-auto max-w-7xl px-4 md:px-6 w-full">
                 <div class="hero-grid grid items-center lg:grid-cols-2">
 
-                    {{-- Текст --}}
-                    <div class="hero-text flex flex-col text-center lg:text-left" data-reveal data-reveal-delay="0">
+                    <div class="hero-text flex flex-col text-center lg:text-left" data-reveal>
                         <div class="hero-text__head">
-                            <p class="inline-block text-sm font-semibold uppercase tracking-widest mb-4"
+                            <p class="inline-block text-sm font-semibold uppercase tracking-widest"
                                style="color: var(--theme-gradient-from)" data-reveal data-reveal-delay="200">
                                 {{ $cluster['badge'] }}
                             </p>
@@ -120,192 +110,159 @@
                             </p>
                         </div>
 
-                        {{-- Преимущества --}}
-                        <div class="mt-6 grid grid-cols-2 gap-3" data-reveal data-reveal-delay="500">
-                            @foreach ($cluster['benefits'] as $benefit)
-                                <div class="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <i data-lucide="{{ $benefit['icon'] }}" style="width:16px;height:16px;flex-shrink:0;color:var(--theme-gradient-from)"></i>
-                                    {{ $benefit['text'] }}
+                        <div class="flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start hero-cta-row"
+                             data-reveal data-reveal-delay="600">
+                            <a href="{{ $canonicalBase }}/"
+                               class="btn btn-gradient hero-cta-primary-desktop"
+                               style="padding:1rem 2rem;font-size:1.1rem;font-weight:800;gap:.75rem;border-radius:1rem;box-shadow:0 6px 28px color-mix(in srgb, var(--theme-gradient-from) 45%, transparent);">
+                                <span>Подробнее обо мне</span>
+                                <i data-lucide="arrow-right" style="width:22px;height:22px"></i>
+                            </a>
+                            <a href="#contacts"
+                               class="btn btn-lg btn-outline-amber group hero-cta-secondary">
+                                <span>Написать</span>
+                                <i data-lucide="arrow-down" style="width:18px;height:18px"></i>
+                            </a>
+                        </div>
+
+                        <div class="flex items-center justify-center gap-6 sm:gap-8 lg:justify-start hero-stats"
+                             data-reveal data-reveal-delay="800">
+                            @foreach ($cluster['stats'] as $i => $stat)
+                                <div class="flex items-center gap-6 sm:gap-8">
+                                    <div class="text-center">
+                                        <p class="hero-stat-value font-bold theme-gradient-text-amber">{{ $stat['value'] }}</p>
+                                        <p class="text-xs text-muted-foreground sm:text-sm">{{ $stat['label'] }}</p>
+                                    </div>
+                                    @if ($i < count($cluster['stats']) - 1)
+                                        <div class="h-10 w-px" style="background: color-mix(in srgb, var(--theme-gradient-from) 35%, transparent)"></div>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>
-
-                        {{-- CTA-кнопки --}}
-                        <div class="hero-cta mt-8 flex flex-wrap justify-center gap-3 lg:justify-start" data-reveal data-reveal-delay="600">
-                            <a href="{{ $tgUrl }}" target="_blank" rel="noopener"
-                               class="btn btn-lg btn-theme">
-                                <i data-lucide="send" style="width:18px;height:18px"></i>
-                                Написать в Telegram
-                            </a>
-                            <a href="#contacts" class="btn btn-lg btn-outline">
-                                Бесплатный созвон
-                            </a>
-                        </div>
                     </div>
 
-                    {{-- Фото --}}
-                    <div class="hero-image-wrapper relative flex items-center justify-center" data-reveal="right" data-reveal-delay="200">
-                        <div class="hero-image-frame relative z-10">
+                    <div class="hero-image-wrap relative mx-auto w-full max-w-md lg:max-w-none"
+                         data-reveal="right" data-reveal-delay="400">
+                        <div class="hero-mobile-overlay" aria-hidden="true"></div>
+                        <div class="photo-frame with-top-shadow hero-photo-frame">
                             <img src="{{ $heroImage }}"
                                  alt="{{ $personFullName }} — {{ $cluster['h1'] }}"
-                                 class="hero-image block"
-                                 loading="eager"
-                                 fetchpriority="high"
-                                 width="520" height="640">
+                                 style="width:100%;height:100%;object-fit:cover;"
+                                 loading="eager" fetchpriority="high">
+                        </div>
+                        <div class="glow glow-amber glow-pulse-amber" style="bottom:-2rem;left:-2rem;width:12rem;height:12rem;z-index:-1;"></div>
+                        <div class="glow glow-teal glow-pulse-teal" style="top:-2rem;right:-2rem;width:14rem;height:14rem;z-index:-1;"></div>
+                        <div class="hero-badge" data-reveal data-reveal-delay="1100">
+                            <p class="text-xs uppercase tracking-wider text-muted-foreground">Формат</p>
+                            <p class="text-sm font-semibold theme-gradient-text-amber">Онлайн по всему миру</p>
                         </div>
                     </div>
+
+                    <a href="#contacts" class="btn btn-gradient hero-cta-primary-float"
+                       style="font-weight:800;gap:.6rem;">
+                        <span>Написать</span>
+                        <i data-lucide="arrow-down" style="width:16px;height:16px"></i>
+                    </a>
 
                 </div>
             </div>
         </section>
 
-        {{-- Отзывы --}}
-        @if ($reviews->isNotEmpty())
-            <section class="relative py-20 md:py-24 bg-secondary">
-                <div class="mx-auto max-w-7xl px-4 md:px-6">
-                    <div class="mb-12 text-center" data-reveal>
-                        <p class="text-sm font-semibold uppercase tracking-widest mb-3 theme-gradient-text">Отзывы</p>
-                        <h2 class="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                            Что говорят <span class="theme-gradient-text">клиенты</span>
-                        </h2>
-                    </div>
-                    <div class="grid gap-6 md:grid-cols-3">
-                        @foreach ($reviews as $review)
-                            <div class="card p-6 flex flex-col gap-4" data-reveal data-reveal-group="cluster-reviews">
-                                <div class="flex gap-0.5">
-                                    @for ($s = 0; $s < 5; $s++)
-                                        <i data-lucide="star" style="width:16px;height:16px;color:var(--theme-gradient-from);fill:var(--theme-gradient-from)"></i>
-                                    @endfor
-                                </div>
-                                <p class="text-sm leading-relaxed text-muted-foreground flex-1">&laquo;{{ $review['text'] }}&raquo;</p>
-                                <div>
-                                    <p class="font-semibold text-sm text-foreground">{{ $review['author'] }}</p>
-                                    @if ($review['detail'])
-                                        <p class="text-xs text-muted-foreground">{{ $review['detail'] }}</p>
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </section>
-        @endif
-
-        {{-- FAQ --}}
-        @if ($faqs->isNotEmpty())
-            <section id="faq" class="relative overflow-hidden py-20 md:py-28 theme-surface">
-                <div class="relative mx-auto max-w-7xl px-4 md:px-6">
-                    <div class="mx-auto mb-16 max-w-2xl space-y-4 text-center" data-reveal>
-                        <p class="text-sm font-semibold uppercase tracking-widest theme-gradient-text">FAQ</p>
-                        <h2 class="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                            Частые <span class="theme-gradient-text">вопросы</span>
-                        </h2>
-                        <p class="text-lg text-muted-foreground">Ответы на вопросы, которые чаще всего задают перед началом терапии</p>
-                    </div>
-                    <div class="mx-auto max-w-3xl space-y-4" data-reveal>
-                        @foreach ($faqs as $i => $faq)
-                            <div class="faq-item" data-reveal data-reveal-group="cluster-faq">
-                                <button type="button" class="faq-trigger" aria-expanded="false" aria-controls="cluster-faq-content-{{ $i }}">
-                                    <span class="pr-4">{{ $faq['question'] }}</span>
-                                    <span class="faq-chevron ml-auto flex-shrink-0">
-                                        <i data-lucide="chevron-down" style="width:20px;height:20px"></i>
-                                    </span>
-                                </button>
-                                <div id="cluster-faq-content-{{ $i }}" class="faq-content" role="region">
-                                    <p class="pb-5 pt-1 text-sm leading-relaxed text-muted-foreground">{{ $faq['answer'] }}</p>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </section>
-        @endif
-
         {{-- Контакты --}}
         <section id="contacts" class="relative overflow-hidden py-20 md:py-28 bg-secondary">
             <div class="contacts-bg"></div>
+            @include('landing._floating', ['variant' => 'contacts'])
 
-            <div class="relative mx-auto max-w-5xl px-4 md:px-6">
-                <div class="text-center mb-12" data-reveal>
-                    <p class="text-sm font-semibold uppercase tracking-widest mb-3" style="color: var(--theme-gradient-from)">Контакты</p>
-                    <h2 class="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                        Запишитесь на <span class="theme-gradient-text-amber">консультацию</span>
-                    </h2>
-                    <p class="mt-4 text-lg text-muted-foreground">Пишите в любой удобный мессенджер — отвечаю в течение дня.</p>
-                </div>
+            <div class="relative mx-auto max-w-7xl px-4 md:px-6">
+                <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
 
-                {{-- Бесплатный созвон --}}
-                <div class="free-call-card max-w-xl mx-auto mb-10" data-reveal>
-                    <span class="deco"></span>
-                    <div class="relative flex items-center gap-4">
-                        <div class="flex h-14 w-14 items-center justify-center rounded-2xl"
-                             style="background: rgba(255,255,255,.2); backdrop-filter: blur(8px);">
-                            <i data-lucide="phone" style="width:26px;height:26px;color:#fff"></i>
+                    <div class="flex flex-col justify-center space-y-8" data-reveal="left">
+                        <div class="space-y-4 self-start text-left">
+                            <p class="text-sm font-semibold uppercase tracking-widest"
+                               style="color: var(--theme-gradient-from)">Контакты</p>
+                            <h2 class="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+                                Запишитесь на <span class="theme-gradient-text-amber">консультацию</span>
+                            </h2>
+                            <p class="text-lg leading-relaxed text-muted-foreground">
+                                Пишите в любой удобный мессенджер — отвечаю в течение дня.
+                            </p>
                         </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-white">Бесплатный созвон</h3>
-                            <p class="text-sm" style="color: rgba(255,255,255,.85)">15 минут для знакомства</p>
+
+                        <div class="free-call-card" data-reveal data-reveal-delay="200">
+                            <span class="deco"></span>
+                            <div class="relative flex items-center gap-4">
+                                <div class="flex h-14 w-14 items-center justify-center rounded-2xl"
+                                     style="background:rgba(255,255,255,.2);backdrop-filter:blur(8px);">
+                                    <i data-lucide="phone" style="width:26px;height:26px;color:#fff"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white">Бесплатный созвон</h3>
+                                    <p class="text-sm" style="color:rgba(255,255,255,.85)">15 минут для знакомства</p>
+                                </div>
+                            </div>
+                            <p class="relative mt-4" style="color:rgba(255,255,255,.95)">
+                                Можно предварительно созвониться — просто познакомиться и понять, подходим ли мы друг другу. Это бесплатно и ни к чему не обязывает.
+                            </p>
                         </div>
                     </div>
-                    <p class="relative mt-4" style="color: rgba(255,255,255,.95)">
-                        Можно предварительно созвониться — просто познакомиться и понять, подходим ли мы друг другу. Это бесплатно и ни к чему не обязывает.
-                    </p>
-                </div>
 
-                {{-- Кнопки --}}
-                <div class="flex flex-wrap justify-center gap-4" data-reveal data-reveal-delay="200">
-                    <a href="{{ $tgUrl }}" target="_blank" rel="noopener"
-                       class="inline-flex items-center gap-2 rounded-2xl px-6 py-4 font-bold transition-all hover:scale-[1.03]"
-                       style="background:#5865f2;color:#fff;box-shadow:0 4px 20px rgba(88,101,242,.45)">
-                        <i data-lucide="send" style="width:18px;height:18px;flex-shrink:0"></i>
-                        Telegram
-                    </a>
-                    <a href="{{ $waUrl }}" target="_blank" rel="noopener"
-                       class="inline-flex items-center gap-2 rounded-2xl px-6 py-4 font-bold transition-all hover:scale-[1.03]"
-                       style="background:#25d366;color:#fff;box-shadow:0 4px 20px rgba(37,211,102,.4)">
-                        <i data-lucide="message-circle" style="width:18px;height:18px;flex-shrink:0"></i>
-                        WhatsApp
-                    </a>
-                    <a href="{{ $maxUrl }}" target="_blank" rel="noopener"
-                       class="inline-flex items-center gap-2 rounded-2xl px-6 py-4 font-bold transition-all hover:scale-[1.03]"
-                       style="background:#0077ff;color:#fff;box-shadow:0 4px 20px rgba(0,119,255,.4)">
-                        <i data-lucide="message-square" style="width:18px;height:18px;flex-shrink:0"></i>
-                        Max
-                    </a>
-                </div>
+                    <div class="flex flex-col gap-4" data-reveal="right">
+                        <p class="font-semibold text-foreground">Напишите мне:</p>
+                        <div class="flex flex-col flex-wrap gap-4 sm:flex-row">
+                            <a href="{{ $tgUrl }}" target="_blank" rel="noopener"
+                               class="btn btn-lg btn-telegram flex-1 min-w-[10rem]">
+                                <i data-lucide="send" style="width:20px;height:20px"></i>
+                                <span>Telegram</span>
+                            </a>
+                            <a href="{{ $waUrl }}" target="_blank" rel="noopener"
+                               class="btn btn-lg btn-whatsapp flex-1 min-w-[10rem]">
+                                <i data-lucide="message-circle" style="width:20px;height:20px"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                            <a href="{{ $maxUrl }}" target="_blank" rel="noopener"
+                               class="btn btn-lg btn-max flex-1 min-w-[10rem]">
+                                <i data-lucide="message-square" style="width:20px;height:20px"></i>
+                                <span>Max</span>
+                            </a>
+                        </div>
 
-                {{-- Адрес и телефон --}}
-                <div class="mt-10 flex flex-wrap justify-center gap-8 text-sm text-muted-foreground" data-reveal data-reveal-delay="300">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="map-pin" style="width:16px;height:16px;color:var(--theme-gradient-from)"></i>
-                        {{ $locationText }}
+                        <div class="card flex items-center gap-3 p-4 mt-2">
+                            <div class="icon-box-sm icon-box" style="width:42px;height:42px;border-radius:.85rem">
+                                <i data-lucide="map-pin" style="width:20px;height:20px"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-foreground">Очный приём</p>
+                                <p class="text-sm text-muted-foreground">{{ $content?->location_text ?: 'Владивосток, Артём' }}</p>
+                            </div>
+                        </div>
+
+                        @if ($content?->person_phone)
+                            <a href="tel:{{ $content->person_phone }}"
+                               class="inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:opacity-75 transition-opacity">
+                                <i data-lucide="phone" style="width:15px;height:15px;color:var(--theme-gradient-from)"></i>
+                                {{ $content->person_phone }}
+                            </a>
+                        @endif
                     </div>
-                    @if ($personPhone)
-                        <a href="tel:{{ $personPhone }}" class="flex items-center gap-2 hover:text-foreground transition-colors">
-                            <i data-lucide="phone" style="width:16px;height:16px;color:var(--theme-gradient-from)"></i>
-                            {{ $personPhone }}
-                        </a>
-                    @endif
+
                 </div>
             </div>
         </section>
 
     </main>
 
-    {{-- Футер --}}
-    <footer class="border-t border-border py-10 bg-background">
+    <footer class="border-t border-border py-8">
         <div class="mx-auto max-w-7xl px-4 md:px-6">
-            <div class="flex flex-col items-center gap-4 text-center">
-                <a href="{{ $canonicalBase }}/" class="text-xl font-bold theme-gradient-text">{{ $personFullName }}</a>
-                <p class="text-sm text-muted-foreground">Гештальт-терапевт. Помогаю находить опору и контакт с собой.</p>
-                <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+            <div class="flex flex-col items-center gap-3 text-center">
+                <a href="{{ $canonicalBase }}/" class="text-lg font-bold theme-gradient-text">{{ $personFullName }}</a>
+                <nav class="flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm text-muted-foreground">
                     <a href="{{ $canonicalBase }}/" class="hover:text-foreground transition-colors">Главная</a>
                     <a href="{{ $canonicalBase }}/psiholog-online" class="hover:text-foreground transition-colors">Психолог онлайн</a>
                     <a href="{{ $canonicalBase }}/geshtalt-terapevt" class="hover:text-foreground transition-colors">Гештальт-терапевт</a>
                     <a href="{{ $canonicalBase }}/psiholog-vladivostok" class="hover:text-foreground transition-colors">Психолог Владивосток</a>
                     <a href="{{ $canonicalBase }}/psiholog-artem" class="hover:text-foreground transition-colors">Психолог Артём</a>
                     <a href="{{ $canonicalBase }}/blog" class="hover:text-foreground transition-colors">Блог</a>
-                </div>
+                </nav>
                 <p class="text-xs text-muted-foreground">© {{ date('Y') }} {{ $personFullName }}</p>
             </div>
         </div>

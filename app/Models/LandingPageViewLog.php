@@ -11,6 +11,7 @@ class LandingPageViewLog extends Model
 {
     protected $fillable = [
         'landing_page_content_id',
+        'page',
         'viewed_at',
         'ip',
         'user_agent',

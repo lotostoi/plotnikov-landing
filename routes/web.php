@@ -12,10 +12,10 @@ Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // Посадочные страницы под кластеры запросов
-Route::get('/psiholog-online', [ClusterPageController::class, 'show'])->defaults('slug', 'psiholog-online')->name('cluster.psiholog-online');
-Route::get('/geshtalt-terapevt', [ClusterPageController::class, 'show'])->defaults('slug', 'geshtalt-terapevt')->name('cluster.geshtalt-terapevt');
-Route::get('/psiholog-vladivostok', [ClusterPageController::class, 'show'])->defaults('slug', 'psiholog-vladivostok')->name('cluster.psiholog-vladivostok');
-Route::get('/psiholog-artem', [ClusterPageController::class, 'show'])->defaults('slug', 'psiholog-artem')->name('cluster.psiholog-artem');
+Route::get('/psiholog-online',      fn () => app(ClusterPageController::class)->show('psiholog-online'))->name('cluster.psiholog-online');
+Route::get('/geshtalt-terapevt',    fn () => app(ClusterPageController::class)->show('geshtalt-terapevt'))->name('cluster.geshtalt-terapevt');
+Route::get('/psiholog-vladivostok', fn () => app(ClusterPageController::class)->show('psiholog-vladivostok'))->name('cluster.psiholog-vladivostok');
+Route::get('/psiholog-artem',       fn () => app(ClusterPageController::class)->show('psiholog-artem'))->name('cluster.psiholog-artem');
 
 Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots');
