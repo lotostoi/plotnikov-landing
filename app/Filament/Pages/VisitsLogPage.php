@@ -7,7 +7,6 @@ namespace App\Filament\Pages;
 use App\Models\LandingPageViewLog;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -37,7 +36,7 @@ class VisitsLogPage extends Page implements HasTable
             ->query(
                 LandingPageViewLog::query()->latest('viewed_at')
             )
-            ->columns(array_filter([
+            ->columns(array_values(array_filter([
                 TextColumn::make('viewed_at')
                     ->label('Дата и время')
                     ->dateTime('d.m.Y H:i:s')
@@ -112,8 +111,8 @@ class VisitsLogPage extends Page implements HasTable
                     ->limit(60)
                     ->tooltip(fn (LandingPageViewLog $record): ?string => $record->user_agent)
                     ->toggleable(isToggledHiddenByDefault: true) : null,
-            ]))
-            ->filters(array_filter([
+            ])))
+            ->filters(array_values(array_filter([
                 $hasNewColumns ? SelectFilter::make('device')
                     ->label('Устройство')
                     ->options([
@@ -161,7 +160,7 @@ class VisitsLogPage extends Page implements HasTable
                     ->label('Только с UTM')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('utm_source'))
                     ->toggle(),
-            ]))
+            ])))
             ->defaultSort('viewed_at', 'desc')
             ->paginated([25, 50, 100])
             ->striped()
