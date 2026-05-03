@@ -21,7 +21,7 @@ class VisitsLogPage extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static string $view = 'filament.pages.visits-log-page';
+    protected string $view = 'filament.pages.visits-log-page';
 
     protected static ?string $navigationLabel = 'Посещения';
     protected static ?string $title = 'Журнал посещений';
