@@ -15,6 +15,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Schema;
+use UnitEnum;
 
 class VisitsLogPage extends Page implements HasTable
 {
@@ -25,7 +26,7 @@ class VisitsLogPage extends Page implements HasTable
     protected static ?string $navigationLabel = 'Посещения';
     protected static ?string $title = 'Журнал посещений';
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
-    protected static ?string $navigationGroup = 'Инфопанель';
+    protected static UnitEnum|string|null $navigationGroup = 'Инфопанель';
     protected static ?int $navigationSort = 2;
 
     public function table(Table $table): Table
