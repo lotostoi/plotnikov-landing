@@ -176,49 +176,66 @@
     </article>
 
     {{-- CTA-баннер --}}
+    @php
+        $tgUrl = $contacts?->telegram_url ?: 'https://t.me/AlexanderP_V';
+        $waUrl = $contacts?->whatsapp_url ?: 'https://wa.me/79242521756';
+    @endphp
     <div class="mx-auto max-w-3xl px-4 pb-10 md:px-6">
-        <div class="relative overflow-hidden rounded-2xl px-7 py-8 md:px-10 md:py-10"
-             style="background: linear-gradient(135deg, var(--theme-gradient-from) 0%, var(--theme-gradient-to) 100%);">
+        <div class="relative overflow-hidden rounded-2xl px-7 py-9 md:px-10 md:py-11"
+             style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%); box-shadow: 0 8px 40px rgba(79,70,229,.45);">
 
-            {{-- Декоративные круги --}}
-            <span class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-20"
-                  style="background: rgba(255,255,255,.35);"></span>
-            <span class="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full opacity-15"
-                  style="background: rgba(255,255,255,.35);"></span>
+            {{-- Декор --}}
+            <span class="pointer-events-none absolute -right-12 -top-12 h-52 w-52 rounded-full"
+                  style="background: radial-gradient(circle, rgba(167,139,250,.25) 0%, transparent 70%);"></span>
+            <span class="pointer-events-none absolute -bottom-10 -left-10 h-44 w-44 rounded-full"
+                  style="background: radial-gradient(circle, rgba(196,181,253,.18) 0%, transparent 70%);"></span>
 
-            <div class="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                <div class="space-y-2">
-                    <p class="text-xs font-semibold uppercase tracking-widest text-white/70">Психолог · Александр Плотников</p>
-                    <h3 class="text-xl font-bold text-white sm:text-2xl">
-                        Тема отзывается?
+            <div class="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+
+                {{-- Текст --}}
+                <div class="space-y-3 lg:max-w-md">
+                    <span class="inline-block rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-widest"
+                          style="background: rgba(167,139,250,.25); color: #c4b5fd; border: 1px solid rgba(167,139,250,.35);">
+                        Психолог · Александр Плотников
+                    </span>
+                    <h3 class="text-2xl font-extrabold text-white sm:text-3xl leading-tight">
+                        Тема отзывается?<br>
+                        <span style="color: #a78bfa;">Запишитесь на консультацию</span>
                     </h3>
-                    <p class="text-sm leading-relaxed text-white/85 max-w-sm">
-                        Запишитесь на консультацию — разберём вашу ситуацию лично. Онлайн или очно.
+                    <p class="text-sm leading-relaxed" style="color: rgba(255,255,255,.80);">
+                        Разберём вашу ситуацию лично — онлайн или очно.
                     </p>
-                    <p class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
-                       style="background: rgba(255,255,255,.22); color: #fff; border: 1px solid rgba(255,255,255,.35);">
-                        <span style="font-size:13px;">✓</span> Бесплатный созвон для знакомства — 15 минут
+                    <p class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold"
+                       style="background: rgba(52,211,153,.18); color: #6ee7b7; border: 1px solid rgba(52,211,153,.35);">
+                        ✓ Бесплатный созвон для знакомства — 15 минут
                     </p>
                 </div>
 
-                <div class="flex flex-col gap-2.5 sm:flex-shrink-0">
-                    @php
-                        $tgUrl  = $contacts?->telegram_url  ?: 'https://t.me/AlexanderP_V';
-                        $waUrl  = $contacts?->whatsapp_url  ?: 'https://wa.me/79242521756';
-                    @endphp
-
+                {{-- Кнопки --}}
+                <div class="flex flex-col gap-3 lg:flex-shrink-0 lg:min-w-[190px]">
                     <a href="{{ $tgUrl }}" target="_blank" rel="noopener"
-                       class="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-200 hover:scale-[1.03]"
-                       style="background: rgba(255,255,255,.18); color: #fff; border: 1.5px solid rgba(255,255,255,.35); backdrop-filter: blur(6px);">
+                       class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold transition-all duration-200 hover:scale-[1.03] hover:brightness-110"
+                       style="background: #5865f2; color: #fff; box-shadow: 0 3px 14px rgba(88,101,242,.5);">
                         <i data-lucide="send" style="width:15px;height:15px;flex-shrink:0;"></i>
                         Написать в Telegram
                     </a>
-
                     <a href="{{ $waUrl }}" target="_blank" rel="noopener"
-                       class="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-200 hover:scale-[1.03]"
-                       style="background: rgba(255,255,255,.18); color: #fff; border: 1.5px solid rgba(255,255,255,.35); backdrop-filter: blur(6px);">
+                       class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold transition-all duration-200 hover:scale-[1.03] hover:brightness-110"
+                       style="background: #25d366; color: #fff; box-shadow: 0 3px 14px rgba(37,211,102,.4);">
                         <i data-lucide="message-circle" style="width:15px;height:15px;flex-shrink:0;"></i>
                         Написать в WhatsApp
+                    </a>
+                    <a href="{{ $maxUrl }}" target="_blank" rel="noopener"
+                       class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold transition-all duration-200 hover:scale-[1.03] hover:brightness-110"
+                       style="background: #0077ff; color: #fff; box-shadow: 0 3px 14px rgba(0,119,255,.4);">
+                        <i data-lucide="message-square" style="width:15px;height:15px;flex-shrink:0;"></i>
+                        {{ $maxText }}
+                    </a>
+                    <a href="{{ $channelUrl }}" target="_blank" rel="noopener"
+                       class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-all duration-200 hover:scale-[1.03]"
+                       style="background: rgba(255,255,255,.10); color: rgba(255,255,255,.85); border: 1.5px solid rgba(255,255,255,.22);">
+                        <i data-lucide="book-open" style="width:15px;height:15px;flex-shrink:0;"></i>
+                        Читать обо мне в канале
                     </a>
                 </div>
             </div>

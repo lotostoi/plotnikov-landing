@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\LandingBlock;
 use App\Models\LandingPageContent;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Response;
@@ -50,6 +51,19 @@ class BlogController extends Controller
 
         $contacts = LandingPageContent::query()->first();
 
-        return view('blog.show', compact('article', 'related', 'contacts'));
+        $ctaMax = LandingBlock::where('section_code', 'contacts')
+            ->where('block_key', 'cta_max')
+            ->first();
+
+        $maxUrl  = $ctaMax?->button_url  ?: 'https://max.ru/u/f9LHodD0cOIZh45J-Dg2owlXzPWe-IUg2R7DDGo-yx1QdDAdLYK1SUWEHxM';
+        $maxText = $ctaMax?->button_text ?: 'MAX';
+
+        $ctaTelegramChannel = LandingBlock::where('section_code', 'contacts')
+            ->where('block_key', 'telegram_channel')
+            ->first();
+
+        $channelUrl = $ctaTelegramChannel?->button_url ?: 'https://t.me/plotnikov_aleksander';
+
+        return view('blog.show', compact('article', 'related', 'contacts', 'maxUrl', 'maxText', 'channelUrl'));
     }
 }
