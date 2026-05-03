@@ -71,7 +71,6 @@
             <a href="{{ $canonicalBase }}/" class="group flex items-center gap-2 text-foreground hover:opacity-80 transition-opacity">
                 <i data-lucide="arrow-left" style="width:17px;height:17px;" class="text-muted-foreground"></i>
                 <span class="text-xl font-bold tracking-tight theme-gradient-text">{{ $personFullName }}</span>
-                <span class="hidden text-sm sm:inline-block text-muted-foreground">/ психолог</span>
             </a>
             <div class="flex items-center gap-3">
                 <button id="theme-toggle" type="button" class="theme-toggle" aria-label="Переключить тему">
