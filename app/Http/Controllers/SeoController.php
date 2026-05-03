@@ -33,6 +33,13 @@ class SeoController extends Controller
         $homeLastmod = $content?->updated_at ?? now();
 
         // В <loc> нельзя использовать URL с фрагментом (#) — только реальные пути.
+        $clusterPaths = [
+            '/psiholog-online',
+            '/geshtalt-terapevt',
+            '/psiholog-vladivostok',
+            '/psiholog-artem',
+        ];
+
         $entries = [
             [
                 'loc' => $base . '/',
@@ -47,6 +54,15 @@ class SeoController extends Controller
                 'priority' => '0.8',
             ],
         ];
+
+        foreach ($clusterPaths as $path) {
+            $entries[] = [
+                'loc' => $base . $path,
+                'lastmod' => $homeLastmod,
+                'changefreq' => 'monthly',
+                'priority' => '0.9',
+            ];
+        }
 
         if (Schema::hasTable('articles')) {
             $articles = Article::published()

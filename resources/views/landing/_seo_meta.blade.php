@@ -1,6 +1,7 @@
 @php
     $title = $content->seo_title;
-    $description = $content->seo_description;
+    $defaultDescription = 'Гештальт-терапевт Александр Плотников — онлайн-консультации по всему миру, очно во Владивостоке и Артёме. 15 лет практики. Первый созвон бесплатно.';
+    $description = $content->seo_description ?: $defaultDescription;
     $keywords = $content->seo_keywords;
     $robots = $content->robots ?: 'index,follow';
     $canonical = $canonicalUrl ?: url('/');

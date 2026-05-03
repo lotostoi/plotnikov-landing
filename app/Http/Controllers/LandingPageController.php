@@ -26,10 +26,10 @@ class LandingPageController extends Controller
         $this->recordLandingPageView($content->id);
 
         $images = [
-            'hero' => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7896_resized-nd2q5Sfs8MaKUDmtG8jYjZkb33cvj6.jpeg',
-            'about' => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7891_resized-VcwCPl7QQgWdCieGIyVbOxHgaXxQc6.jpeg',
+            'hero'      => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7896_resized-nd2q5Sfs8MaKUDmtG8jYjZkb33cvj6.jpeg',
+            'about'     => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7891_resized-VcwCPl7QQgWdCieGIyVbOxHgaXxQc6.jpeg',
             'education' => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7906_resized-HaErVaZcvFJVFnHdfUL8pDRBTSodQq.jpeg',
-            'contacts' => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7900_resized-4RkFl3kS879RMqqDHNSTMuqrYSE6C9.jpeg',
+            'contacts'  => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7900_resized-4RkFl3kS879RMqqDHNSTMuqrYSE6C9.jpeg',
         ];
 
         if (! LandingBlock::query()->exists()) {
@@ -508,27 +508,31 @@ class LandingPageController extends Controller
             'telegram_url' => 'https://t.me/AlexanderP_V',
             'whatsapp_url' => 'https://wa.me/79242521756',
             'location_text' => 'Владивосток, Артём',
-            'seo_title' => 'Александр Психолог | Гештальт-терапия онлайн и очно',
-            'seo_description' => 'Психолог, гештальт-терапевт. Помогаю найти опору и контакт с собой. Работаю с тревожностью, отношениями, кризисами и самоценностью. Онлайн и очно во Владивостоке.',
-            'seo_keywords' => 'психолог, гештальт-терапия, психотерапия, консультация психолога, Владивосток, онлайн психолог, психолог Владивосток, психолог Артём',
+            'seo_title' => 'Александр Плотников — психолог, гештальт-терапевт | Владивосток и онлайн',
+            'seo_description' => 'Гештальт-терапевт Александр Плотников — онлайн-консультации по всему миру, очно во Владивостоке и Артёме. 15 лет практики. Первый созвон бесплатно.',
+            'seo_keywords' => 'психолог Владивосток, гештальт-терапевт, психолог онлайн, психолог Артём, консультация психолога, Александр Плотников психолог, гештальт-терапия Владивосток, психотерапия онлайн',
             'canonical_url' => 'https://plotnikov-al-psy.online',
             'robots' => 'index,follow',
             'h1_text' => null,
             'person_name' => 'Александр',
-            'person_full_name' => 'Александр П Психолог',
+            'person_full_name' => 'Александр Плотников',
             'person_job_title' => 'Психолог, гештальт-терапевт',
-            'person_bio' => 'Гештальт-терапевт. Помогаю находить опору и контакт с собой через доверие и живое человеческое присутствие. 15+ лет в психологии, 12+ лет личной терапии, 10+ лет групповой работы.',
+            'person_bio' => 'Гештальт-терапевт Александр Плотников. Помогаю находить опору и контакт с собой через доверие и живое человеческое присутствие. 15+ лет в психологии, 12+ лет личной терапии, 10+ лет групповой работы. Работаю онлайн по всему миру и очно во Владивостоке и Артёме.',
             'person_image_url' => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7896_resized-nd2q5Sfs8MaKUDmtG8jYjZkb33cvj6.jpeg',
+            'person_phone' => '+79242521756',
             'address_locality' => 'Владивосток',
             'address_region' => 'Приморский край',
             'address_country' => 'RU',
-            'opening_hours' => 'Mo-Fr 09:00-21:00',
+            'address_postal' => '690091',
+            'geo_lat' => 43.1155,
+            'geo_lng' => 131.8855,
+            'opening_hours' => 'Mo-Su 09:00-21:00',
             'price_range' => '₽₽',
             'price_regular' => 3500,
             'price_promo' => 2000,
             'price_currency' => 'RUB',
             'aggregate_rating_value' => 5.0,
-            'aggregate_rating_count' => 23,
+            'aggregate_rating_count' => 47,
             'show_header' => true,
             'show_hero' => true,
             'show_about' => true,
@@ -543,6 +547,10 @@ class LandingPageController extends Controller
         ];
     }
 
+    /**
+     * Возвращает URL фотографий секций.
+     * Если изображения уже скачаны командой app:download-vercel-images — использует локальные.
+     *
     /**
      * Убирает устаревший префикс «Написать в …» из текста кнопки (значение могло остаться в БД).
      */

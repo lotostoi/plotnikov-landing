@@ -3,6 +3,7 @@
     $businessId = $canonicalUrl . '#business';
     $websiteId = $canonicalUrl . '#website';
     $orgId = $canonicalUrl . '#organization';
+    $schemaDescription = $content->seo_description ?: 'Гештальт-терапевт Александр Плотников — онлайн-консультации по всему миру, очно во Владивостоке и Артёме. 15 лет практики. Первый созвон бесплатно.';
 
     $person = [
         '@type' => 'Person',
@@ -10,7 +11,7 @@
         'name' => $content->person_full_name ?: ($content->person_name ?: 'Александр'),
         'givenName' => $content->person_name ?: 'Александр',
         'jobTitle' => $content->person_job_title ?: 'Психолог, гештальт-терапевт',
-        'description' => $content->person_bio ?: $content->seo_description,
+        'description' => $content->person_bio ?: $schemaDescription,
         'image' => $content->person_image_url ?: ($images['hero'] ?? null),
         'url' => $canonicalUrl,
         'knowsAbout' => [
@@ -46,10 +47,10 @@
     ]);
 
     $business = [
-        '@type' => ['ProfessionalService', 'LocalBusiness'],
+        '@type' => ['LocalBusiness', 'MedicalBusiness'],
         '@id' => $businessId,
         'name' => $content->person_full_name ?: 'Александр Психолог',
-        'description' => $content->seo_description,
+        'description' => $schemaDescription,
         'url' => $canonicalUrl,
         'image' => $ogImage ?: ($images['hero'] ?? null),
         'logo' => $ogImage ?: ($images['hero'] ?? null),
@@ -142,7 +143,7 @@
         '@id' => $websiteId,
         'url' => $canonicalUrl,
         'name' => $content->seo_title,
-        'description' => $content->seo_description,
+        'description' => $schemaDescription,
         'inLanguage' => 'ru-RU',
         'publisher' => ['@id' => $personId],
     ];
