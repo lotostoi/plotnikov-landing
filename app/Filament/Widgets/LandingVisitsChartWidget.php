@@ -30,7 +30,7 @@ class LandingVisitsChartWidget extends ChartWidget
 
     protected function getType(): string
     {
-        return 'line';
+        return 'bar';
     }
 
     protected function getFilters(): ?array
@@ -43,6 +43,27 @@ class LandingVisitsChartWidget extends ChartWidget
         ];
     }
 
+    protected function getOptions(): array
+    {
+        return [
+            'plugins' => [
+                'legend' => ['display' => false],
+            ],
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                    'ticks'       => ['precision' => 0, 'stepSize' => 1],
+                    'grid'        => ['color' => 'rgba(127,127,127,.08)'],
+                ],
+                'x' => [
+                    'grid' => ['display' => false],
+                ],
+            ],
+            'barPercentage'      => 0.75,
+            'categoryPercentage' => 0.9,
+        ];
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -51,16 +72,11 @@ class LandingVisitsChartWidget extends ChartWidget
         if (! Schema::hasTable('landing_page_view_logs')) {
             return [
                 'labels'   => [],
-                'datasets' => [
-                    [
-                        'label' => 'Просмотры',
-                        'data'  => [],
-                    ],
-                ],
+                'datasets' => [['label' => 'Просмотры', 'data' => []]],
             ];
         }
 
-        $days = max(1, min(366, (int) ($this->filter ?: 30)));
+        $days  = max(1, min(366, (int) ($this->filter ?: 30)));
         $tz    = config('app.timezone') ?: 'UTC';
         $end   = Carbon::now($tz)->endOfDay();
         $start = Carbon::now($tz)->subDays($days - 1)->startOfDay();
@@ -72,7 +88,7 @@ class LandingVisitsChartWidget extends ChartWidget
 
         $counts = [];
         foreach ($logs as $log) {
-            $key = $log->viewed_at->timezone($tz)->format('Y-m-d');
+            $key          = $log->viewed_at->timezone($tz)->format('Y-m-d');
             $counts[$key] = ($counts[$key] ?? 0) + 1;
         }
 
@@ -81,9 +97,9 @@ class LandingVisitsChartWidget extends ChartWidget
         $cursor = $start->copy();
 
         for ($i = 0; $i < $days; $i++) {
-            $key        = $cursor->format('Y-m-d');
-            $labels[]   = $cursor->format('d.m');
-            $data[]     = $counts[$key] ?? 0;
+            $key      = $cursor->format('Y-m-d');
+            $labels[] = $cursor->format('d.m');
+            $data[]   = $counts[$key] ?? 0;
             $cursor->addDay();
         }
 
@@ -91,8 +107,13 @@ class LandingVisitsChartWidget extends ChartWidget
             'labels'   => $labels,
             'datasets' => [
                 [
-                    'label' => 'Просмотры',
-                    'data'  => $data,
+                    'label'           => 'Просмотры',
+                    'data'            => $data,
+                    'backgroundColor' => 'rgba(245,158,11,0.72)',
+                    'borderColor'     => 'rgba(245,158,11,1)',
+                    'borderWidth'     => 1,
+                    'borderRadius'    => 5,
+                    'hoverBackgroundColor' => 'rgba(245,158,11,0.92)',
                 ],
             ],
         ];

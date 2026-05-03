@@ -580,9 +580,20 @@ class LandingPageController extends Controller
                 ]);
 
             if (Schema::hasTable('landing_page_view_logs')) {
+                $ua = (string) (request()->userAgent() ?? '');
+
                 LandingPageViewLog::query()->create([
                     'landing_page_content_id' => $contentId,
-                    'viewed_at'                 => now(),
+                    'viewed_at'               => now(),
+                    'ip'                      => request()->ip(),
+                    'user_agent'              => $ua ?: null,
+                    'device'                  => LandingPageViewLog::detectDevice($ua),
+                    'referrer'                => request()->header('referer') ?: null,
+                    'utm_source'              => request()->query('utm_source') ?: null,
+                    'utm_medium'              => request()->query('utm_medium') ?: null,
+                    'utm_campaign'            => request()->query('utm_campaign') ?: null,
+                    'utm_term'                => request()->query('utm_term') ?: null,
+                    'utm_content'             => request()->query('utm_content') ?: null,
                 ]);
             }
         } catch (Throwable) {
