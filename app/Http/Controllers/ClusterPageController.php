@@ -180,10 +180,10 @@ class ClusterPageController extends Controller
 
         $heroImage = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7896_resized-nd2q5Sfs8MaKUDmtG8jYjZkb33cvj6.jpeg';
 
-        // Третий стат — цена онлайн-консультации из поля price_regular в админке
-        $priceRegular = $content?->price_regular;
-        $cluster['stats'][2] = $priceRegular
-            ? ['value' => 'от ' . number_format((int) $priceRegular, 0, '.', ' ') . ' ₽', 'label' => 'онлайн-сессия']
+        // Третий стат — минимальная цена из настроек консультаций в админке.
+        $minPrice = $this->resolveMinPrice($content);
+        $cluster['stats'][2] = $minPrice
+            ? ['value' => 'от ' . number_format($minPrice, 0, '.', ' ') . ' ₽', 'label' => 'за сессию']
             : ['value' => '55', 'label' => 'мин / сессия'];
 
         $personFullName = $content?->person_full_name ?: 'Александр Плотников';
@@ -283,6 +283,45 @@ class ClusterPageController extends Controller
     public function slugs(): array
     {
         return array_keys($this->clusters());
+    }
+
+    /**
+     * Возвращает минимальную цену консультации из price_regular и price_promo.
+     * Поля могут быть plain integer или JSON {"meta":{"price":3500}}.
+     */
+    private function resolveMinPrice(?LandingPageContent $content): ?int
+    {
+        if (! $content) {
+            return null;
+        }
+
+        $row = DB::table('landing_page_contents')
+            ->where('id', $content->id)
+            ->first(['price_regular', 'price_promo']);
+
+        $prices = [];
+        foreach (['price_regular', 'price_promo'] as $field) {
+            $raw = $row?->{$field};
+            if ($raw === null || $raw === '') {
+                continue;
+            }
+            if (is_numeric($raw)) {
+                $val = (int) $raw;
+                if ($val > 0) {
+                    $prices[] = $val;
+                }
+                continue;
+            }
+            $decoded = json_decode((string) $raw, true);
+            if (is_array($decoded)) {
+                $fromMeta = $decoded['meta']['price'] ?? null;
+                if ($fromMeta !== null && is_numeric($fromMeta) && (int) $fromMeta > 0) {
+                    $prices[] = (int) $fromMeta;
+                }
+            }
+        }
+
+        return $prices ? min($prices) : null;
     }
 
     private function recordView(int $contentId, string $page): void
