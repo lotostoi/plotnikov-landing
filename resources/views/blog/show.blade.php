@@ -193,7 +193,11 @@
                         Тема отзывается?
                     </h3>
                     <p class="text-sm leading-relaxed text-white/85 max-w-sm">
-                        Запишитесь на консультацию — разберём вашу ситуацию лично. Онлайн или очно, бесплатный созвон 15 минут.
+                        Запишитесь на консультацию — разберём вашу ситуацию лично. Онлайн или очно.
+                    </p>
+                    <p class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+                       style="background: rgba(255,255,255,.22); color: #fff; border: 1px solid rgba(255,255,255,.35);">
+                        <span style="font-size:13px;">✓</span> Бесплатный созвон для знакомства — 15 минут
                     </p>
                 </div>
 

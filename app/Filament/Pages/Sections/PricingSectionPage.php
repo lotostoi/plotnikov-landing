@@ -150,8 +150,8 @@ class PricingSectionPage extends Page
                             ->dehydrated(false)
                             ->live()
                             ->content(function (Get $get): HtmlString {
-                                $cols    = $get('heading.meta.card_cols') ?: '2';
-                                $variant = $get('heading.meta.card_variant') ?: 'default';
+                                $cols    = (string) ($get('heading.meta.card_cols') ?: '2');
+                                $variant = (string) ($get('heading.meta.card_variant') ?: 'default');
                                 return new HtmlString(self::buildCardPreview($cols, $variant));
                             })
                             ->columnSpanFull(),
