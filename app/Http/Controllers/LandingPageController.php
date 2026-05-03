@@ -375,11 +375,12 @@ class LandingPageController extends Controller
             'pricingPromos' => $pricingBlocks
                 ->where('block_type', 'promo')
                 ->map(fn (LandingBlock $b): array => [
-                    'badge'    => $b->badge ?: 'Акция',
-                    'title'    => $b->title ?: '',
-                    'price'    => $b->subtitle ?: '',
-                    'body'     => $b->body ?: '',
-                    'terms'    => $b->button_text ?: '',
+                    'badge'        => $b->badge ?: 'Акция',
+                    'title'        => $b->title ?: '',
+                    'price'        => $b->subtitle ?: '',
+                    'body'         => $b->body ?: '',
+                    'terms'        => $b->button_text ?: '',
+                    'desktop_span' => $b->meta['desktop_span'] ?? 'half',
                 ])
                 ->values()
                 ->all(),

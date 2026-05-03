@@ -82,12 +82,13 @@ class PricingSectionPage extends Page
             ],
             'consults' => $consults,
             'promos'   => $promos->map(fn (LandingBlock $b): array => [
-                'badge'       => $b->badge,
-                'title'       => $b->title,
-                'subtitle'    => $b->subtitle,
-                'body'        => $b->body,
-                'button_text' => $b->button_text,
-                'is_visible'  => $b->is_visible,
+                'badge'        => $b->badge,
+                'title'        => $b->title,
+                'subtitle'     => $b->subtitle,
+                'body'         => $b->body,
+                'button_text'  => $b->button_text,
+                'is_visible'   => $b->is_visible,
+                'desktop_span' => $b->meta['desktop_span'] ?? 'half',
             ])->values()->all(),
         ]);
     }
@@ -261,6 +262,16 @@ class PricingSectionPage extends Page
                                     ->maxLength(255)
                                     ->columnSpanFull(),
 
+                                Select::make('desktop_span')
+                                    ->label('Ширина карточки (десктоп)')
+                                    ->options([
+                                        'half' => 'Обычная — один слот сетки',
+                                        'full' => 'Полная ширина — на весь ряд',
+                                    ])
+                                    ->default('half')
+                                    ->native(false)
+                                    ->columnSpanFull(),
+
                                 Toggle::make('is_visible')
                                     ->label('Показывать')
                                     ->default(true)
@@ -357,6 +368,7 @@ class PricingSectionPage extends Page
                 'button_text'  => $promo['button_text'] ?? null,
                 'is_visible'   => (bool) ($promo['is_visible'] ?? true),
                 'sort_order'   => $promoIdx * 10 + 100,
+                'meta'         => ['desktop_span' => $promo['desktop_span'] ?? 'half'],
             ]);
         }
 

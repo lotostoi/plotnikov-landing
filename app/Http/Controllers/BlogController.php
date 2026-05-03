@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\LandingPageContent;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -47,6 +48,8 @@ class BlogController extends Controller
             ->limit(3)
             ->get();
 
-        return view('blog.show', compact('article', 'related'));
+        $contacts = LandingPageContent::query()->first();
+
+        return view('blog.show', compact('article', 'related', 'contacts'));
     }
 }

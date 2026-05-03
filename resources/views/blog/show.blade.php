@@ -175,6 +175,52 @@
         </div>
     </article>
 
+    {{-- CTA-баннер --}}
+    <div class="mx-auto max-w-3xl px-4 pb-10 md:px-6">
+        <div class="relative overflow-hidden rounded-2xl px-7 py-8 md:px-10 md:py-10"
+             style="background: linear-gradient(135deg, var(--theme-gradient-from) 0%, var(--theme-gradient-to) 100%);">
+
+            {{-- Декоративные круги --}}
+            <span class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-20"
+                  style="background: rgba(255,255,255,.35);"></span>
+            <span class="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full opacity-15"
+                  style="background: rgba(255,255,255,.35);"></span>
+
+            <div class="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div class="space-y-2">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-white/70">Психолог · Александр Плотников</p>
+                    <h3 class="text-xl font-bold text-white sm:text-2xl">
+                        Тема отзывается?
+                    </h3>
+                    <p class="text-sm leading-relaxed text-white/85 max-w-sm">
+                        Запишитесь на консультацию — разберём вашу ситуацию лично. Онлайн или очно, бесплатный созвон 15 минут.
+                    </p>
+                </div>
+
+                <div class="flex flex-col gap-2.5 sm:flex-shrink-0">
+                    @php
+                        $tgUrl  = $contacts?->telegram_url  ?: 'https://t.me/AlexanderP_V';
+                        $waUrl  = $contacts?->whatsapp_url  ?: 'https://wa.me/79242521756';
+                    @endphp
+
+                    <a href="{{ $tgUrl }}" target="_blank" rel="noopener"
+                       class="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-200 hover:scale-[1.03]"
+                       style="background: rgba(255,255,255,.18); color: #fff; border: 1.5px solid rgba(255,255,255,.35); backdrop-filter: blur(6px);">
+                        <i data-lucide="send" style="width:15px;height:15px;flex-shrink:0;"></i>
+                        Написать в Telegram
+                    </a>
+
+                    <a href="{{ $waUrl }}" target="_blank" rel="noopener"
+                       class="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-200 hover:scale-[1.03]"
+                       style="background: rgba(255,255,255,.18); color: #fff; border: 1.5px solid rgba(255,255,255,.35); backdrop-filter: blur(6px);">
+                        <i data-lucide="message-circle" style="width:15px;height:15px;flex-shrink:0;"></i>
+                        Написать в WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Похожие статьи --}}
     @if ($related->isNotEmpty())
         <section class="border-t border-border bg-secondary py-16">

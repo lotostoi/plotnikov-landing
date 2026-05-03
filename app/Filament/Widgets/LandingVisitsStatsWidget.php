@@ -10,6 +10,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class LandingVisitsStatsWidget extends StatsOverviewWidget
 {
+    protected static bool $isDiscovered = false;
+
     protected static ?int $sort = -5;
 
     protected ?string $pollingInterval = null;

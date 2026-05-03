@@ -67,7 +67,10 @@
         @if (!empty($pricingPromos))
         <div class="grid gap-5 pricing-grid {{ $promoColsClass }}" data-reveal>
             @foreach ($pricingPromos as $promo)
-            <article class="promo-card p-6 md:p-7">
+            <article @class([
+                'promo-card p-6 md:p-7',
+                'pricing-card--full' => ($promo['desktop_span'] ?? 'half') === 'full',
+            ])>
                 <div class="ribbon">
                     <i data-lucide="sparkles" style="width:13px;height:13px"></i>
                     <span>{{ $promo['badge'] }}</span>

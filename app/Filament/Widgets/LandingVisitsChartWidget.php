@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Schema;
 
 class LandingVisitsChartWidget extends ChartWidget
 {
+    protected static bool $isDiscovered = false;
+
     protected static ?int $sort = -4;
 
     protected int | string | array $columnSpan = 'full';
