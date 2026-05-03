@@ -21,6 +21,9 @@
 
     <link rel="canonical" href="{{ url()->current() }}">
 
+    @include('partials.site_favicon_links', ['favicon' => $faviconUrl ?? null])
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">

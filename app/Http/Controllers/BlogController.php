@@ -16,20 +16,22 @@ class BlogController extends Controller
 {
     public function index(): View
     {
+        $faviconUrl = LandingPageContent::query()->first()?->faviconResolvedUrl();
+
         if (! Schema::hasTable('articles')) {
             $articles = new LengthAwarePaginator([], 0, 9, 1, [
                 'path' => request()->url(),
                 'query' => request()->query(),
             ]);
 
-            return view('blog.index', compact('articles'));
+            return view('blog.index', compact('articles', 'faviconUrl'));
         }
 
         $articles = Article::published()
             ->latest('published_at')
             ->paginate(9);
 
-        return view('blog.index', compact('articles'));
+        return view('blog.index', compact('articles', 'faviconUrl'));
     }
 
     public function show(string $slug): View|Response
@@ -64,6 +66,8 @@ class BlogController extends Controller
 
         $channelUrl = $ctaTelegramChannel?->button_url ?: 'https://t.me/plotnikov_aleksander';
 
-        return view('blog.show', compact('article', 'related', 'contacts', 'maxUrl', 'maxText', 'channelUrl'));
+        $faviconUrl = $contacts?->faviconResolvedUrl();
+
+        return view('blog.show', compact('article', 'related', 'contacts', 'maxUrl', 'maxText', 'channelUrl', 'faviconUrl'));
     }
 }

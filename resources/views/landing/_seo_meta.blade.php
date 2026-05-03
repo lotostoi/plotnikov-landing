@@ -5,7 +5,6 @@
     $robots = $content->robots ?: 'index,follow';
     $canonical = $canonicalUrl ?: url('/');
     $ogImage = $ogImage ?: ($images['hero'] ?? null);
-    $faviconUrl = $favicon ?: asset('favicon.ico');
     $appleTouchIconUrl = $appleTouchIcon;
 @endphp
 
@@ -39,11 +38,8 @@
 <link rel="alternate" hreflang="ru" href="{{ $canonical }}">
 <link rel="alternate" hreflang="x-default" href="{{ $canonical }}">
 
-{{-- Иконки --}}
-@if ($faviconUrl)
-    <link rel="icon" type="image/png" href="{{ $faviconUrl }}">
-    <link rel="shortcut icon" href="{{ $faviconUrl }}">
-@endif
+{{-- Иконки (по умолчанию public/favicon.svg; из админки — загруженный файл) --}}
+@include('partials.site_favicon_links', ['favicon' => $favicon ?? null])
 @if ($appleTouchIconUrl)
     <link rel="apple-touch-icon" sizes="180x180" href="{{ $appleTouchIconUrl }}">
 @endif
