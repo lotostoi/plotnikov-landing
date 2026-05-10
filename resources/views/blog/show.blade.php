@@ -4,22 +4,80 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    @php
+        $articleUrl   = url()->current();
+        $siteBase     = rtrim($contacts?->canonical_url ?: config('app.url') ?: url('/'), '/');
+        $personName   = $contacts?->person_full_name ?: ($contacts?->person_name ?: 'Александр Плотников');
+        $metaDesc     = $article->excerpt ?: $article->snippet;
+    @endphp
+
     <title>{{ $article->title }} — Александр, психолог</title>
-    <meta name="description" content="{{ $article->excerpt ?? $article->title }}">
+    <meta name="description" content="{{ $metaDesc }}">
 
     {{-- OpenGraph --}}
     <meta property="og:type" content="article">
     <meta property="og:title" content="{{ $article->title }}">
-    <meta property="og:description" content="{{ $article->excerpt ?? $article->title }}">
+    <meta property="og:description" content="{{ $metaDesc }}">
+    <meta property="og:url" content="{{ $articleUrl }}">
+    <meta property="og:site_name" content="{{ $personName }}">
+    <meta property="og:locale" content="ru_RU">
     @if ($article->cover_image_url)
         <meta property="og:image" content="{{ $article->cover_image_url }}">
+        <meta property="og:image:alt" content="{{ $article->title }}">
     @endif
-    <meta property="og:url" content="{{ url()->current() }}">
     @if ($article->published_at)
         <meta property="article:published_time" content="{{ $article->published_at->toIso8601String() }}">
     @endif
+    @if ($article->updated_at)
+        <meta property="article:modified_time" content="{{ $article->updated_at->toIso8601String() }}">
+    @endif
+    <meta property="article:author" content="{{ $personName }}">
+    @if ($article->category)
+        <meta property="article:section" content="{{ $article->category }}">
+    @endif
 
-    <link rel="canonical" href="{{ url()->current() }}">
+    {{-- Twitter Card --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $article->title }}">
+    <meta name="twitter:description" content="{{ $metaDesc }}">
+    @if ($article->cover_image_url)
+        <meta name="twitter:image" content="{{ $article->cover_image_url }}">
+    @endif
+
+    <link rel="canonical" href="{{ $articleUrl }}">
+
+    {{-- JSON-LD: BlogPosting + BreadcrumbList --}}
+    @php
+        $schema = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                array_filter([
+                    '@type'            => 'BlogPosting',
+                    '@id'              => $articleUrl . '#article',
+                    'headline'         => $article->title,
+                    'description'      => $metaDesc,
+                    'image'            => $article->cover_image_url ?: null,
+                    'url'              => $articleUrl,
+                    'datePublished'    => $article->published_at?->toIso8601String(),
+                    'dateModified'     => ($article->updated_at ?? $article->published_at)?->toIso8601String(),
+                    'inLanguage'       => 'ru-RU',
+                    'articleSection'   => $article->category ?: null,
+                    'author'           => ['@type' => 'Person', 'name' => $personName, 'url' => $siteBase . '/'],
+                    'publisher'        => ['@type' => 'Organization', 'name' => $personName, 'url' => $siteBase . '/'],
+                    'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => $articleUrl],
+                ]),
+                [
+                    '@type' => 'BreadcrumbList',
+                    'itemListElement' => [
+                        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Главная', 'item' => $siteBase . '/'],
+                        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Блог',    'item' => $siteBase . '/blog'],
+                        ['@type' => 'ListItem', 'position' => 3, 'name' => $article->title, 'item' => $articleUrl],
+                    ],
+                ],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 
     @include('partials.site_favicon_links', ['favicon' => $faviconUrl ?? null])
     <link rel="manifest" href="{{ asset('site.webmanifest') }}">

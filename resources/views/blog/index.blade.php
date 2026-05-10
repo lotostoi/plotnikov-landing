@@ -4,8 +4,53 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    @php
+        $blogBase = rtrim(config('app.url') ?: url('/'), '/');
+        $blogUrl  = $blogBase . '/blog';
+    @endphp
+
     <title>Блог — Александр, психолог</title>
     <meta name="description" content="Статьи о психологии, гештальт-терапии, отношениях и личностном росте">
+
+    <link rel="canonical" href="{{ $blogUrl }}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Блог — Александр, психолог">
+    <meta property="og:description" content="Статьи о психологии, гештальт-терапии, отношениях и личностном росте">
+    <meta property="og:url" content="{{ $blogUrl }}">
+    <meta property="og:site_name" content="Александр Плотников — психолог">
+    <meta property="og:locale" content="ru_RU">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Блог — Александр, психолог">
+    <meta name="twitter:description" content="Статьи о психологии, гештальт-терапии, отношениях и личностном росте">
+
+    {{-- JSON-LD --}}
+    @php
+        $blogSchema = [
+            '@context' => 'https://schema.org',
+            '@graph'   => [
+                [
+                    '@type'           => 'Blog',
+                    '@id'             => $blogUrl . '#blog',
+                    'name'            => 'Блог Александра Плотникова',
+                    'description'     => 'Статьи о психологии, гештальт-терапии, отношениях и личностном росте',
+                    'url'             => $blogUrl,
+                    'inLanguage'      => 'ru-RU',
+                    'author'          => ['@type' => 'Person', 'name' => 'Александр Плотников', 'url' => $blogBase . '/'],
+                    'publisher'       => ['@type' => 'Organization', 'name' => 'Александр Плотников', 'url' => $blogBase . '/'],
+                ],
+                [
+                    '@type' => 'BreadcrumbList',
+                    'itemListElement' => [
+                        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Главная', 'item' => $blogBase . '/'],
+                        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Блог',    'item' => $blogUrl],
+                    ],
+                ],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($blogSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 
     @include('partials.site_favicon_links', ['favicon' => $faviconUrl ?? null])
     <link rel="manifest" href="{{ asset('site.webmanifest') }}">
