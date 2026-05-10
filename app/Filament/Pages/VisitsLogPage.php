@@ -54,6 +54,8 @@ class VisitsLogPage extends Page implements HasTable
                         str_starts_with((string) $state, '/geshtalt-terapevt')    => 'warning',
                         str_starts_with((string) $state, '/psiholog-vladivostok') => 'primary',
                         str_starts_with((string) $state, '/psiholog-artem')       => 'gray',
+                        str_starts_with((string) $state, '/blog/')                => 'danger',
+                        $state === '/blog'                  => 'danger',
                         default => 'gray',
                     })
                     ->sortable() : null,
@@ -130,13 +132,24 @@ class VisitsLogPage extends Page implements HasTable
             ->filters(array_values(array_filter([
                 $hasPageColumn ? SelectFilter::make('page')
                     ->label('Страница')
-                    ->options([
-                        '/'                      => '🏠 Главная',
-                        '/psiholog-online'       => '🌐 Психолог онлайн',
-                        '/geshtalt-terapevt'     => '🧠 Гештальт-терапевт',
-                        '/psiholog-vladivostok'  => '📍 Психолог Владивосток',
-                        '/psiholog-artem'        => '📍 Психолог Артём',
-                    ]) : null,
+                    ->options(function (): array {
+                        $static = [
+                            '/'                      => '🏠 Главная',
+                            '/psiholog-online'       => '🌐 Психолог онлайн',
+                            '/geshtalt-terapevt'     => '🧠 Гештальт-терапевт',
+                            '/psiholog-vladivostok'  => '📍 Психолог Владивосток',
+                            '/psiholog-artem'        => '📍 Психолог Артём',
+                            '/blog'                  => '📝 Блог (список)',
+                        ];
+                        $blogPages = LandingPageViewLog::query()
+                            ->where('page', 'like', '/blog/%')
+                            ->distinct()
+                            ->orderBy('page')
+                            ->pluck('page', 'page')
+                            ->mapWithKeys(fn (string $p): array => [$p => '📄 ' . $p])
+                            ->toArray();
+                        return array_merge($static, $blogPages);
+                    }) : null,
 
                 $hasNewColumns ? SelectFilter::make('device')
                     ->label('Устройство')

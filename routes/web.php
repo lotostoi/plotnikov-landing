@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', LandingPageController::class)->name('landing');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+Route::post('/blog/{slug}/like', [BlogController::class, 'like'])->name('blog.like');
 
 // Посадочные страницы под кластеры запросов
 Route::get('/psiholog-online',      fn () => app(ClusterPageController::class)->show('psiholog-online'))->name('cluster.psiholog-online');
