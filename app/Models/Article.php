@@ -6,6 +6,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class Article extends Model
@@ -61,9 +63,19 @@ class Article extends Model
         return $slug;
     }
 
+    public function likes(): HasMany
+    {
+        return $this->hasMany(ArticleLike::class);
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('is_published', true);
+    }
+
+    public function scopeWithLikesCount(Builder $query): Builder
+    {
+        return $query->withCount('likes');
     }
 
     public function getCoverImageUrlAttribute(): ?string

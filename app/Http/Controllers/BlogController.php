@@ -37,6 +37,7 @@ class BlogController extends Controller
         }
 
         $articles = Article::published()
+            ->withCount('likes')
             ->latest('published_at')
             ->paginate(9);
 

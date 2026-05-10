@@ -239,7 +239,9 @@ class LandingPageController extends Controller
 
         $articles = Schema::hasTable('articles')
             ? Article::published()
-                ->latest('published_at')
+                ->withCount('likes')
+                ->orderByDesc('likes_count')
+                ->orderByDesc('published_at')
                 ->limit(3)
                 ->get()
             : collect();
