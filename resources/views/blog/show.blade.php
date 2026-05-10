@@ -197,7 +197,7 @@
     @endif
 
     {{-- Статья --}}
-    <article class="mx-auto max-w-3xl px-4 py-10 md:px-6">
+    <article class="mx-auto max-w-4xl px-4 py-10 md:px-6">
 
         {{-- Мета --}}
         <div class="mb-6 flex flex-wrap items-center gap-3">
@@ -237,7 +237,7 @@
     </article>
 
     {{-- Лайк --}}
-    <div class="mx-auto max-w-3xl px-4 pb-8 md:px-6">
+    <div class="mx-auto max-w-4xl px-4 pb-8 md:px-6">
         <div class="flex items-center gap-3">
             <button
                 id="like-btn"
@@ -260,7 +260,7 @@
         $tgUrl = $contacts?->telegram_url ?: 'https://t.me/AlexanderP_V';
         $waUrl = $contacts?->whatsapp_url ?: 'https://wa.me/79242521756';
     @endphp
-    <div class="mx-auto max-w-3xl px-4 pb-10 md:px-6">
+    <div class="mx-auto max-w-4xl px-4 pb-10 md:px-6">
         <div class="relative overflow-hidden rounded-2xl px-7 py-9 md:px-10 md:py-11"
              style="background: var(--card); border: 1px solid var(--border); box-shadow: 0 4px 32px color-mix(in srgb, var(--theme-gradient-from) 14%, transparent);">
 
