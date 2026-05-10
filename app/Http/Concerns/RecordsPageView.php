@@ -6,14 +6,17 @@ namespace App\Http\Concerns;
 
 use App\Models\LandingPageContent;
 use App\Models\LandingPageViewLog;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Throwable;
 
 trait RecordsPageView
 {
-    /** Минимальный интервал между двумя визитами одного IP на одну страницу (часы). */
-    private int $deduplicateHours = 5;
+    private const VIEW_COOKIE       = 'visitor_token';
+    private const VIEW_COOKIE_DAYS  = 365;
+    private const DEDUP_HOURS       = 24;
 
     protected function recordPageView(string $page): void
     {
@@ -23,10 +26,9 @@ trait RecordsPageView
                 return;
             }
 
-            $ip = request()->ip();
+            $token = $this->resolveViewerToken();
 
-            // Дедупликация: не писать визит, если тот же IP был на той же странице < N часов назад
-            if ($this->recentVisitExists($ip, $page)) {
+            if ($this->recentVisitExists($token, $page)) {
                 return;
             }
 
@@ -46,7 +48,8 @@ trait RecordsPageView
             $data = [
                 'landing_page_content_id' => $content->id,
                 'viewed_at'               => now(),
-                'ip'                      => $ip,
+                'ip'                      => request()->ip(),
+                'visitor_token'           => Schema::hasColumn('landing_page_view_logs', 'visitor_token') ? $token : null,
                 'user_agent'              => $ua ?: null,
                 'device'                  => LandingPageViewLog::detectDevice($ua),
                 'referrer'                => request()->header('referer') ?: null,
@@ -61,23 +64,57 @@ trait RecordsPageView
                 $data['page'] = $page;
             }
 
+            // Remove visitor_token from data if column doesn't exist yet
+            if (! Schema::hasColumn('landing_page_view_logs', 'visitor_token')) {
+                unset($data['visitor_token']);
+            }
+
             LandingPageViewLog::query()->create($data);
         } catch (Throwable) {
             // Never break page rendering on analytics failure.
         }
     }
 
-    private function recentVisitExists(string $ip, string $page): bool
+    /**
+     * Returns existing visitor token from cookie, or generates and queues a new one.
+     */
+    private function resolveViewerToken(): string
+    {
+        $token = request()->cookie(self::VIEW_COOKIE);
+
+        if (! $token) {
+            $token = Str::uuid()->toString();
+            Cookie::queue(
+                self::VIEW_COOKIE,
+                $token,
+                60 * 24 * self::VIEW_COOKIE_DAYS,
+                '/',
+                null,
+                null,
+                true
+            );
+        }
+
+        return $token;
+    }
+
+    private function recentVisitExists(string $token, string $page): bool
     {
         if (! Schema::hasTable('landing_page_view_logs')) {
             return false;
         }
 
-        $hasPage = Schema::hasColumn('landing_page_view_logs', 'page');
+        $hasToken = Schema::hasColumn('landing_page_view_logs', 'visitor_token');
+        $hasPage  = Schema::hasColumn('landing_page_view_logs', 'page');
 
         $query = LandingPageViewLog::query()
-            ->where('ip', $ip)
-            ->where('viewed_at', '>=', now()->subHours($this->deduplicateHours));
+            ->where('viewed_at', '>=', now()->subHours(self::DEDUP_HOURS));
+
+        if ($hasToken) {
+            $query->where('visitor_token', $token);
+        } else {
+            $query->where('ip', request()->ip());
+        }
 
         if ($hasPage) {
             $query->where('page', $page);
