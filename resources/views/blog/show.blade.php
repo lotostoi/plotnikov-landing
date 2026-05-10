@@ -178,6 +178,25 @@
         </div>
     </article>
 
+    {{-- Лайк --}}
+    <div class="mx-auto max-w-3xl px-4 pb-8 md:px-6">
+        <div class="flex items-center gap-3">
+            <button
+                id="like-btn"
+                data-url="{{ route('blog.like', $article->slug) }}"
+                data-liked="{{ $userLiked ? 'true' : 'false' }}"
+                class="inline-flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none"
+                style="{{ $userLiked
+                    ? 'background: var(--theme-gradient-from); color: #fff; border-color: transparent;'
+                    : 'background: transparent; color: var(--muted-foreground); border-color: var(--border);' }}"
+            >
+                <span id="like-heart">{{ $userLiked ? '❤️' : '🤍' }}</span>
+                <span id="like-count">{{ $likesCount }}</span>
+            </button>
+            <span class="text-sm text-muted-foreground">{{ $userLiked ? 'Вам понравилась эта статья' : 'Понравилась статья?' }}</span>
+        </div>
+    </div>
+
     {{-- CTA-баннер --}}
     @php
         $tgUrl = $contacts?->telegram_url ?: 'https://t.me/AlexanderP_V';
@@ -286,5 +305,40 @@
     </footer>
 
     <script src="{{ asset('js/landing.js') }}?v={{ filemtime(public_path('js/landing.js')) }}"></script>
+    <script>
+    (function () {
+        var btn = document.getElementById('like-btn');
+        if (!btn) return;
+
+        var liked = btn.dataset.liked === 'true';
+
+        btn.addEventListener('click', function () {
+            if (liked) return;
+
+            btn.disabled = true;
+
+            fetch(btn.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin',
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.liked) {
+                    liked = true;
+                    document.getElementById('like-heart').textContent = '❤️';
+                    document.getElementById('like-count').textContent = data.count;
+                    btn.style.cssText = 'background: var(--theme-gradient-from); color: #fff; border-color: transparent;';
+                    var label = btn.nextElementSibling;
+                    if (label) label.textContent = 'Вам понравилась эта статья';
+                }
+            })
+            .catch(function () { btn.disabled = false; });
+        });
+    })();
+    </script>
 </body>
 </html>

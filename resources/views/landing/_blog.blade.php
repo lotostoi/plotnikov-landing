@@ -51,9 +51,14 @@
                             @if ($article->snippet)
                                 <p class="text-sm text-muted-foreground line-clamp-3">{{ $article->snippet }}</p>
                             @endif
-                            <div class="flex items-center gap-1 text-xs text-muted-foreground">
-                                <i data-lucide="calendar" style="width:13px;height:13px"></i>
-                                {{ $article->published_at?->translatedFormat('d F Y') ?? '' }}
+                            <div class="flex items-center justify-between text-xs text-muted-foreground">
+                                <span class="inline-flex items-center gap-1">
+                                    <i data-lucide="calendar" style="width:13px;height:13px"></i>
+                                    {{ $article->published_at?->translatedFormat('d F Y') ?? '' }}
+                                </span>
+                                @if (($article->likes_count ?? 0) > 0)
+                                    <span class="inline-flex items-center gap-0.5">❤️ {{ $article->likes_count }}</span>
+                                @endif
                             </div>
                         </div>
                     </a>

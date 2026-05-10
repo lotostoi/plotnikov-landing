@@ -8,7 +8,9 @@ use App\Filament\Resources\ArticleResource\Pages\CreateArticle;
 use App\Filament\Resources\ArticleResource\Pages\EditArticle;
 use App\Filament\Resources\ArticleResource\Pages\ListArticles;
 use App\Models\Article;
+use App\Models\ArticleLike;
 use Filament\Forms\Components\DateTimePicker;
+use Illuminate\Support\Facades\Schema as DbSchema;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
@@ -156,6 +158,15 @@ class ArticleResource extends Resource
                     ->label('Дата')
                     ->dateTime('d.m.Y')
                     ->sortable(),
+
+                TextColumn::make('likes_count')
+                    ->label('❤️')
+                    ->getStateUsing(fn (Article $record): int =>
+                        DbSchema::hasTable('article_likes')
+                            ? ArticleLike::where('article_id', $record->id)->count()
+                            : 0
+                    )
+                    ->sortable(false),
             ])
             ->defaultSort('published_at', 'desc')
             ->filters([])

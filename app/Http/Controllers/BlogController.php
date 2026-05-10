@@ -4,16 +4,26 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Concerns\RecordsPageView;
 use App\Models\Article;
+use App\Models\ArticleLike;
 use App\Models\LandingBlock;
 use App\Models\LandingPageContent;
+use App\Models\LandingPageViewLog;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
+    use RecordsPageView;
+
+    private const VISITOR_COOKIE = 'visitor_token';
+    private const COOKIE_TTL_DAYS = 365;
+
     public function index(): View
     {
         $faviconUrl = LandingPageContent::query()->first()?->faviconResolvedUrl();
@@ -28,8 +38,11 @@ class BlogController extends Controller
         }
 
         $articles = Article::published()
+            ->withCount('likes')
             ->latest('published_at')
             ->paginate(9);
+
+        $this->recordPageView('/blog');
 
         return view('blog.index', compact('articles', 'faviconUrl'));
     }
@@ -68,6 +81,58 @@ class BlogController extends Controller
 
         $faviconUrl = $contacts?->faviconResolvedUrl();
 
-        return view('blog.show', compact('article', 'related', 'contacts', 'maxUrl', 'maxText', 'channelUrl', 'faviconUrl'));
+        // Visitor token — set if missing
+        $token = request()->cookie(self::VISITOR_COOKIE) ?: Str::uuid()->toString();
+
+        // Like stats
+        $likesCount = Schema::hasTable('article_likes')
+            ? ArticleLike::where('article_id', $article->id)->count()
+            : 0;
+
+        $userLiked = Schema::hasTable('article_likes')
+            && ArticleLike::where('article_id', $article->id)
+                ->where('visitor_token', $token)
+                ->exists();
+
+        $this->recordPageView('/blog/' . $slug);
+
+        $response = response()->view('blog.show', compact(
+            'article', 'related', 'contacts', 'maxUrl', 'maxText',
+            'channelUrl', 'faviconUrl', 'likesCount', 'userLiked'
+        ));
+
+        // Refresh cookie on every visit so it doesn't expire on active readers
+        $response->cookie(self::VISITOR_COOKIE, $token, 60 * 24 * self::COOKIE_TTL_DAYS, '/', null, null, true);
+
+        return $response;
     }
+
+    public function like(string $slug): JsonResponse
+    {
+        if (! Schema::hasTable('articles') || ! Schema::hasTable('article_likes')) {
+            return response()->json(['error' => 'not_available'], 503);
+        }
+
+        $article = Article::published()->where('slug', $slug)->firstOrFail();
+
+        $token = request()->cookie(self::VISITOR_COOKIE) ?: Str::uuid()->toString();
+
+        $alreadyLiked = ArticleLike::where('article_id', $article->id)
+            ->where('visitor_token', $token)
+            ->exists();
+
+        if (! $alreadyLiked) {
+            ArticleLike::create([
+                'article_id'    => $article->id,
+                'visitor_token' => $token,
+            ]);
+        }
+
+        $count = ArticleLike::where('article_id', $article->id)->count();
+
+        return response()
+            ->json(['liked' => true, 'count' => $count])
+            ->cookie(self::VISITOR_COOKIE, $token, 60 * 24 * self::COOKIE_TTL_DAYS, '/', null, null, true);
+    }
+
 }

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Concerns\RecordsPageView;
 use App\Models\LandingBlock;
 use App\Models\LandingPageContent;
-use App\Models\LandingPageViewLog;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Throwable;
 
 class ClusterPageController extends Controller
 {
+    use RecordsPageView;
     /**
      * Конфигурация кластерных посадочных страниц.
      * slug → SEO-данные и контент.
@@ -174,9 +174,7 @@ class ClusterPageController extends Controller
             $onlinePrice = $onlineBlock?->badge ?: null;
         }
 
-        if ($content) {
-            $this->recordView($content->id, $cluster['canonical_path']);
-        }
+        $this->recordPageView($cluster['canonical_path']);
 
         $heroImage = 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7896_resized-nd2q5Sfs8MaKUDmtG8jYjZkb33cvj6.jpeg';
 
@@ -324,43 +322,4 @@ class ClusterPageController extends Controller
         return $prices ? min($prices) : null;
     }
 
-    private function recordView(int $contentId, string $page): void
-    {
-        try {
-            DB::table('landing_page_contents')
-                ->where('id', $contentId)
-                ->update([
-                    'landing_page_views_count' => DB::raw('landing_page_views_count + 1'),
-                    'landing_page_last_view_at' => now(),
-                ]);
-
-            if (! Schema::hasTable('landing_page_view_logs')) {
-                return;
-            }
-
-            $ua = (string) (request()->userAgent() ?? '');
-
-            $data = [
-                'landing_page_content_id' => $contentId,
-                'viewed_at'               => now(),
-                'ip'                      => request()->ip(),
-                'user_agent'              => $ua ?: null,
-                'device'                  => LandingPageViewLog::detectDevice($ua),
-                'referrer'                => request()->header('referer') ?: null,
-                'utm_source'              => request()->query('utm_source') ?: null,
-                'utm_medium'              => request()->query('utm_medium') ?: null,
-                'utm_campaign'            => request()->query('utm_campaign') ?: null,
-                'utm_term'                => request()->query('utm_term') ?: null,
-                'utm_content'             => request()->query('utm_content') ?: null,
-            ];
-
-            if (Schema::hasColumn('landing_page_view_logs', 'page')) {
-                $data['page'] = $page;
-            }
-
-            LandingPageViewLog::query()->create($data);
-        } catch (Throwable) {
-            // Не роняем страницу при ошибках БД.
-        }
-    }
 }

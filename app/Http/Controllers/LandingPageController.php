@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Concerns\RecordsPageView;
 use App\Models\Article;
 use App\Models\LandingBlock;
 use App\Models\LandingPageContent;
-use App\Models\LandingPageViewLog;
 use Database\Seeders\LandingBlocksSeeder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Throwable;
 
 class LandingPageController extends Controller
 {
+    use RecordsPageView;
     public function __invoke(): View
     {
         $content = LandingPageContent::query()->first();
@@ -23,7 +22,7 @@ class LandingPageController extends Controller
             $content = LandingPageContent::query()->create($this->defaults());
         }
 
-        $this->recordLandingPageView($content->id, '/');
+        $this->recordPageView('/');
 
         $images = [
             'hero'      => 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7896_resized-nd2q5Sfs8MaKUDmtG8jYjZkb33cvj6.jpeg',
@@ -239,7 +238,9 @@ class LandingPageController extends Controller
 
         $articles = Schema::hasTable('articles')
             ? Article::published()
-                ->latest('published_at')
+                ->withCount('likes')
+                ->orderByDesc('likes_count')
+                ->orderByDesc('published_at')
                 ->limit(3)
                 ->get()
             : collect();
@@ -574,46 +575,5 @@ class LandingPageController extends Controller
         return $block;
     }
 
-    /**
-     * Счётчик для личного контроля в админке. Обновление через query builder,
-     * чтобы не трогать updated_at (он участвует в lastmod sitemap).
-     */
-    private function recordLandingPageView(int $contentId, string $page = '/'): void
-    {
-        try {
-            DB::table('landing_page_contents')
-                ->where('id', $contentId)
-                ->update([
-                    'landing_page_views_count' => DB::raw('landing_page_views_count + 1'),
-                    'landing_page_last_view_at' => now(),
-                ]);
-
-            if (Schema::hasTable('landing_page_view_logs')) {
-                $ua = (string) (request()->userAgent() ?? '');
-
-                $data = [
-                    'landing_page_content_id' => $contentId,
-                    'viewed_at'               => now(),
-                    'ip'                      => request()->ip(),
-                    'user_agent'              => $ua ?: null,
-                    'device'                  => LandingPageViewLog::detectDevice($ua),
-                    'referrer'                => request()->header('referer') ?: null,
-                    'utm_source'              => request()->query('utm_source') ?: null,
-                    'utm_medium'              => request()->query('utm_medium') ?: null,
-                    'utm_campaign'            => request()->query('utm_campaign') ?: null,
-                    'utm_term'                => request()->query('utm_term') ?: null,
-                    'utm_content'             => request()->query('utm_content') ?: null,
-                ];
-
-                if (Schema::hasColumn('landing_page_view_logs', 'page')) {
-                    $data['page'] = $page;
-                }
-
-                LandingPageViewLog::query()->create($data);
-            }
-        } catch (Throwable) {
-            // Не роняем лендинг при readonly SQLite / неверном DB_DATABASE в кэше.
-        }
-    }
 }
 
