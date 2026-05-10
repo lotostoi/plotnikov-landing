@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Concerns\RecordsPageView;
 use App\Models\Article;
 use App\Models\ArticleLike;
 use App\Models\LandingBlock;
@@ -13,13 +14,13 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Throwable;
 
 class BlogController extends Controller
 {
+    use RecordsPageView;
+
     private const VISITOR_COOKIE = 'visitor_token';
     private const COOKIE_TTL_DAYS = 365;
 
@@ -41,7 +42,7 @@ class BlogController extends Controller
             ->latest('published_at')
             ->paginate(9);
 
-        $this->recordView('/blog');
+        $this->recordPageView('/blog');
 
         return view('blog.index', compact('articles', 'faviconUrl'));
     }
@@ -93,7 +94,7 @@ class BlogController extends Controller
                 ->where('visitor_token', $token)
                 ->exists();
 
-        $this->recordView('/blog/' . $slug);
+        $this->recordPageView('/blog/' . $slug);
 
         $response = response()->view('blog.show', compact(
             'article', 'related', 'contacts', 'maxUrl', 'maxText',
@@ -134,48 +135,4 @@ class BlogController extends Controller
             ->cookie(self::VISITOR_COOKIE, $token, 60 * 24 * self::COOKIE_TTL_DAYS, '/', null, null, true);
     }
 
-    private function recordView(string $page): void
-    {
-        try {
-            $content = LandingPageContent::query()->first();
-            if (! $content) {
-                return;
-            }
-
-            DB::table('landing_page_contents')
-                ->where('id', $content->id)
-                ->update([
-                    'landing_page_views_count' => DB::raw('landing_page_views_count + 1'),
-                    'landing_page_last_view_at' => now(),
-                ]);
-
-            if (! Schema::hasTable('landing_page_view_logs')) {
-                return;
-            }
-
-            $ua = (string) (request()->userAgent() ?? '');
-
-            $data = [
-                'landing_page_content_id' => $content->id,
-                'viewed_at'               => now(),
-                'ip'                      => request()->ip(),
-                'user_agent'              => $ua ?: null,
-                'device'                  => LandingPageViewLog::detectDevice($ua),
-                'referrer'                => request()->header('referer') ?: null,
-                'utm_source'              => request()->query('utm_source') ?: null,
-                'utm_medium'              => request()->query('utm_medium') ?: null,
-                'utm_campaign'            => request()->query('utm_campaign') ?: null,
-                'utm_term'                => request()->query('utm_term') ?: null,
-                'utm_content'             => request()->query('utm_content') ?: null,
-            ];
-
-            if (Schema::hasColumn('landing_page_view_logs', 'page')) {
-                $data['page'] = $page;
-            }
-
-            LandingPageViewLog::query()->create($data);
-        } catch (Throwable) {
-            // Never break page rendering on analytics failure.
-        }
-    }
 }
