@@ -85,9 +85,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <link rel="stylesheet" href="{{ asset('css/tailwind.css') }}?v={{ filemtime(public_path('css/tailwind.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/landing.css') }}?v={{ filemtime(public_path('css/landing.css')) }}">
+    <script src="https://unpkg.com/lucide@latest" defer></script>
 
     <script>
         (function () {
@@ -274,8 +274,8 @@
 
                 {{-- Текст --}}
                 <div class="space-y-3 lg:max-w-md">
-                    <span class="inline-block rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-widest"
-                          style="background: rgba(167,139,250,.25); color: #c4b5fd; border: 1px solid rgba(167,139,250,.35);">
+                    <span class="inline-block rounded-full px-3 py-1 font-bold uppercase tracking-widest"
+                          style="font-size:11px;background: rgba(167,139,250,.25); color: #c4b5fd; border: 1px solid rgba(167,139,250,.35);">
                         Психолог · Александр Плотников
                     </span>
                     <h3 class="text-2xl font-extrabold text-white sm:text-3xl leading-tight">
